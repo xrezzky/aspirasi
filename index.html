@@ -1546,7 +1546,7 @@ function replyBlock(balasan){
   if(balasan && balasan.trim()){
     return `<div class="reply"><strong>Balasan Admin</strong>${esc(balasan)}</div>`;
   }
-  return `<div class="reply pending"><strong>Balasan Admin</strong>Belum ada balasan. Aspirasi kamu sedang ditinjau.</div>`;
+  return "";
 }
 
 function renderHasilCek(rec){
