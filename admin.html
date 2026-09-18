@@ -1069,7 +1069,7 @@ async function afterAuthResolved(){
   // Render header user
   $("#hdrUserName").textContent = profile.username;
   $("#hdrAvatar").textContent = (profile.username || "?").trim().charAt(0).toUpperCase();
-  $("#welcomeTitle").textContent = "Assalamu'alaikum, " + profile.username;
+  $("#welcomeTitle").textContent = "Halo, " + profile.username;
 
   // Owner-only nav
   const isOwner = profile.role === "owner";
