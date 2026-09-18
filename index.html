@@ -47,6 +47,8 @@
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
   @keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes popIn{0%{opacity:0;transform:scale(.5) rotate(-8deg)}70%{opacity:1;transform:scale(1.08) rotate(2deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+  @keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-16px,18px) scale(1.08)}}
   .reveal{opacity:0;animation:fadeUp .8s var(--ease) forwards}
   .reveal.d1{animation-delay:.05s}
   .reveal.d2{animation-delay:.16s}
@@ -54,6 +56,18 @@
   .reveal.d4{animation-delay:.38s}
   .reveal.d5{animation-delay:.48s}
   .card-wrap{opacity:0;animation:cardIn .9s var(--ease) forwards;animation-delay:.4s}
+  .brand-logo{opacity:0;animation:popIn .7s var(--ease) forwards}
+  .glow-blob{
+    position:absolute;top:-60px;right:-60px;width:280px;height:280px;border-radius:50%;
+    background:radial-gradient(circle,rgba(238,180,63,.20),transparent 70%);
+    filter:blur(10px);pointer-events:none;z-index:0;
+    animation:drift 9s ease-in-out infinite;
+  }
+  .glow-blob.b2{
+    top:220px;left:-80px;width:220px;height:220px;
+    background:radial-gradient(circle,rgba(47,107,237,.22),transparent 70%);
+    animation-duration:12s;animation-delay:-4s;
+  }
 
   @media (prefers-reduced-motion:reduce){
     *{animation-duration:.001s !important;animation-iteration-count:1 !important;transition-duration:.001s !important;scroll-behavior:auto !important}
@@ -576,6 +590,8 @@
 <body>
 
   <header class="top">
+    <div class="glow-blob"></div>
+    <div class="glow-blob b2"></div>
     <div class="arches" aria-hidden="true">
       <svg viewBox="0 0 340 230" fill="none">
         <path d="M10 230V120C10 75 50 40 95 40C140 40 180 75 180 120V230" stroke="url(#g1)" stroke-width="1.5"/>
@@ -674,6 +690,13 @@
             </div>
 
             <form id="aspirationForm" novalidate>
+              <!-- Honeypot anti-bot: field ini sembunyi total dari manusia
+                   (posisi di luar layar + aria-hidden), tapi tetap ada di
+                   DOM sehingga bot pengisi-form-otomatis sering mengisinya. -->
+              <div style="position:absolute;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+                <label for="website">Situs Web</label>
+                <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+              </div>
               <div class="grid">
                 <div class="field">
                   <label for="nama">Nama <small>(opsional)</small></label>
@@ -1355,6 +1378,7 @@ $("#clearDraftBtn").addEventListener("click", () => {
    7. SUBMIT → GENERATE KODE
    ========================================================= */
 let lastCode = "";
+let formLoadedAt = Date.now(); // dipakai anti-bot: cek jeda waktu pengisian
 
 form.addEventListener("submit", async e => {
   e.preventDefault();
@@ -1389,37 +1413,41 @@ form.addEventListener("submit", async e => {
   submitBtn.classList.add("loading");
   submitBtn.disabled = true;
 
-  const client = supa || await supaReady;
-  if(!client){
-    submitBtn.classList.remove("loading");
-    submitBtn.disabled = false;
-    alert("Tidak bisa terhubung ke server saat ini. Coba lagi beberapa saat lagi.");
-    return;
-  }
-
   const payload = {
-    p_kategori : form.querySelector('input[name="kategori"]:checked').value,
-    p_jenjang  : jenjangHidden.value,
-    p_kelas    : kelasHidden.value,
-    p_pesan    : pesanEl.value.trim(),
-    p_solusi   : solusiEl.value.trim(),
-    p_nama     : namaEl.value.trim(),
-    p_kontak   : kontakEl.value.trim()
+    kategori : form.querySelector('input[name="kategori"]:checked').value,
+    jenjang  : jenjangHidden.value,
+    kelas    : kelasHidden.value,
+    pesan    : pesanEl.value.trim(),
+    solusi   : solusiEl.value.trim(),
+    nama     : namaEl.value.trim(),
+    kontak   : kontakEl.value.trim(),
+    hp       : $("#website") ? $("#website").value : "",
+    ts       : formLoadedAt
   };
 
-  const { data, error } = await client.rpc("kirim_aspirasi", payload);
+  let resJson = null;
+  let sendError = null;
+  try{
+    const res = await fetch("/api/submit-aspirasi", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    resJson = await res.json();
+    if(!res.ok) sendError = resJson && resJson.error ? resJson.error : "Gagal mengirim aspirasi.";
+  }catch(e){
+    sendError = "Gagal mengirim aspirasi. Periksa koneksi internet kamu dan coba lagi.";
+  }
 
-  if(error || !data){
-    console.error(error);
+  if(sendError || !resJson || !resJson.code){
+    console.error(sendError);
     submitBtn.classList.remove("loading");
     submitBtn.disabled = false;
-    alert(error && error.message
-      ? "Gagal mengirim aspirasi: " + error.message
-      : "Gagal mengirim aspirasi. Periksa koneksi internet kamu dan coba lagi.");
+    alert(sendError || "Gagal mengirim aspirasi. Coba lagi.");
     return;
   }
 
-  const code = data;
+  const code = resJson.code;
   lastCode = code;
   addMyCode(code);
 
@@ -1728,4 +1756,4 @@ renderRiwayat();
 </script>
 
 </body>
-        </html>
+</html>
