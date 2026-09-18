@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0B1E42">
-<title>Admin · Aspirasi Aqilah Hidayah</title>
+<meta name="robots" content="noindex, nofollow">
+<title>Panel Pengurus — Aspirasi Aqilah</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,555 +15,312 @@
   :root{
     --navy:#0a1c40; --navy2:#132c5c; --blue:#1557C0; --blue2:#2f6bed;
     --gold:#eeb43f; --gold-dim:#f6d38a; --green:#178a53;
-    --bg:#f4f6fb; --text:#0f1b32; --muted:#69738c; --card:#fff;
-    --border:#e6eaf3; --shadow:0 24px 60px rgba(10,28,64,.14);
+    --bg:#f4f6fb; --text:#0f1b32; --muted:#69738c;
+    --card:#ffffff; --border:#e6eaf3;
+    --shadow:0 24px 60px rgba(10,28,64,.14);
     --ease:cubic-bezier(.22,1,.36,1);
     --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
-  html,body{height:100%}
+  html{scroll-behavior:smooth}
   body{
     font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-    background:var(--bg);color:var(--text);overflow-x:hidden;
+    background:
+      radial-gradient(1100px 480px at 12% -10%, rgba(238,180,63,.16), transparent 60%),
+      linear-gradient(180deg,#081633 0,var(--navy) 45%,var(--navy2) 78%,var(--bg) 78%);
+    color:var(--text); min-height:100vh; overflow-x:hidden;
   }
   button,input,textarea,select{font:inherit}
   ::selection{background:rgba(238,180,63,.35)}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes cardIn{from{opacity:0;transform:translateY(28px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  .reveal{opacity:0;animation:fadeUp .8s var(--ease) forwards}
+  .card-wrap{opacity:0;animation:cardIn .9s var(--ease) forwards;animation-delay:.25s}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.001s !important;transition-duration:.001s !important}}
 
-  /* LOGIN */
-  .login-wrap{
-    min-height:100vh;display:grid;place-items:center;padding:24px;
-    background:
-      radial-gradient(900px 480px at 15% -10%, rgba(238,180,63,.18), transparent 60%),
-      linear-gradient(160deg,#081633,var(--navy) 55%,var(--navy2));
+  .top{max-width:900px;margin:auto;padding:22px 20px 56px;color:white;position:relative}
+  nav{display:flex;align-items:center;justify-content:space-between;gap:15px;position:relative;z-index:1}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;font-size:15px}
+  .brand-logo{
+    width:44px;height:44px;border-radius:13px;
+    background:linear-gradient(155deg,#ffffff,#eef3ff);color:var(--blue);
+    display:grid;place-items:center;overflow:hidden;font-weight:900;
+    box-shadow:0 10px 26px rgba(0,0,0,.22);
   }
-  .login-card{
-    width:100%;max-width:400px;background:#fff;border-radius:22px;
-    box-shadow:0 30px 70px rgba(0,0,0,.35);
-    padding:34px 30px 30px;position:relative;overflow:hidden;
+  .brand-logo img{width:100%;height:100%;object-fit:cover}
+  .nav-badge{
+    display:flex;align-items:center;gap:8px;padding:8px 14px;
+    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.07);
+    backdrop-filter:blur(6px);border-radius:999px;font-size:11px;font-weight:800;
+    letter-spacing:.4px;color:var(--gold-dim);
   }
-  .login-card::before{
+  .lock-ico{width:13px;height:13px}
+
+  main{max-width:640px;margin:20px auto 70px;padding:0 20px;position:relative;z-index:2}
+  .card{
+    background:var(--card);border:1px solid rgba(255,255,255,.8);
+    border-radius:26px;box-shadow:var(--shadow);padding:30px;position:relative;overflow:hidden;
+  }
+  .card::before{
     content:"";position:absolute;top:0;left:0;right:0;height:4px;
     background:linear-gradient(90deg,var(--gold),var(--blue2) 60%,var(--navy2));
   }
-  .login-logo{
-    width:60px;height:60px;border-radius:16px;
-    background:linear-gradient(155deg,#fff,#eef3ff);color:var(--blue);
-    display:grid;place-items:center;margin:0 auto 16px;
-    box-shadow:0 12px 30px rgba(21,87,192,.2), inset 0 0 0 1px rgba(21,87,192,.08);
-    font-weight:900;font-size:20px;overflow:hidden;
-  }
-  .login-logo img{width:100%;height:100%;object-fit:cover}
-  .login-card h1{
-    font-family:"Fraunces",Georgia,serif;font-weight:600;
-    font-size:24px;text-align:center;letter-spacing:-.3px;margin-bottom:6px;
-  }
-  .login-card .sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:26px}
 
-  label{display:block;font-size:12.5px;font-weight:800;margin-bottom:7px;letter-spacing:.1px}
-  input,textarea,select{
-    width:100%;border:1.5px solid var(--border);background:#fbfcfe;
-    border-radius:12px;padding:12px 13px;outline:none;color:var(--text);
-    transition:border-color .2s,box-shadow .2s,background .2s;font-size:14px;
-  }
-  textarea{min-height:110px;resize:vertical;line-height:1.55}
-  input:focus,textarea:focus,select:focus{
-    border-color:var(--blue2);box-shadow:0 0 0 4px rgba(47,107,237,.12);background:#fff;
-  }
+  .section-title{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+  .icon{width:46px;height:46px;flex:none;display:grid;place-items:center;background:#eaf1ff;color:var(--blue);border-radius:14px}
+  .section-title h2{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:21px;letter-spacing:-.2px}
+  .section-title p{color:var(--muted);font-size:12.5px;margin-top:4px;line-height:1.5}
+
   .field{margin-bottom:16px}
+  label{display:block;font-size:12.5px;font-weight:800;margin-bottom:7px}
+  input,select,textarea{
+    width:100%;border:1.5px solid var(--border);background:#fbfcfe;border-radius:14px;
+    padding:12px 14px;outline:none;color:var(--text);transition:.2s var(--ease);
+  }
+  textarea{min-height:90px;resize:vertical;line-height:1.5}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue2);box-shadow:0 0 0 4px rgba(47,107,237,.12);background:#fff}
 
-  .btn-primary{
-    width:100%;border:0;padding:14px;border-radius:13px;
-    background:linear-gradient(135deg,var(--blue2),var(--blue));
-    color:#fff;font-weight:900;font-size:14.5px;cursor:pointer;
-    box-shadow:0 12px 24px rgba(21,87,192,.26);
-    transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+  .btn{
+    width:100%;border:0;padding:14px;border-radius:14px;
+    background:linear-gradient(135deg,var(--blue2),var(--blue));color:#fff;
+    font-weight:900;font-size:14.5px;cursor:pointer;
+    box-shadow:0 12px 24px rgba(21,87,192,.26);transition:.2s var(--ease);
     display:flex;align-items:center;justify-content:center;gap:8px;
   }
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(21,87,192,.32)}
-  .btn-primary[disabled]{opacity:.65;cursor:default;transform:none}
+  .btn:hover{transform:translateY(-2px)}
+  .btn:disabled{opacity:.6;cursor:default;transform:none}
+  .btn.danger{background:linear-gradient(135deg,#e0655f,#b6362f);box-shadow:0 12px 24px rgba(180,40,30,.25)}
+  .btn.ghost{
+    background:#fbfcfe;color:var(--text);border:1.5px solid var(--border);
+    box-shadow:none;font-weight:800;
+  }
+  .btn.ghost:hover{border-color:var(--blue2);color:var(--blue)}
+  .btn.small{padding:9px 12px;font-size:12.5px;border-radius:11px;width:auto}
 
-  .spinner{
-    width:16px;height:16px;border-radius:50%;
-    border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;
-    animation:spin .7s linear infinite;display:none;
-  }
-  .btn-primary.loading .spinner{display:inline-block}
-  .btn-primary.loading .lbl{display:none}
-  @keyframes spin{to{transform:rotate(360deg)}}
+  .switcher{text-align:center;font-size:12.5px;color:var(--muted);margin-top:16px}
+  .switcher button{background:none;border:0;color:var(--blue);font-weight:800;cursor:pointer;padding:0}
 
-  .err{
-    background:#fdf3f2;border:1px solid #f5d6d3;color:#a5342c;
-    padding:10px 12px;border-radius:10px;font-size:12.5px;margin-bottom:14px;
-    line-height:1.5;
+  .msg{
+    display:flex;gap:10px;padding:12px 14px;border-radius:13px;font-size:12.5px;line-height:1.5;margin-bottom:16px;
   }
+  .msg.error{background:#fdf3f2;border:1px solid #f5d6d3;color:#a5342c}
+  .msg.ok{background:#eef9f2;border:1px solid #cdeedb;color:#1f7a4d}
+  .msg.info{background:#eef4ff;border:1px solid #d7e4fb;color:#1d3a6e}
 
-  /* APP */
-  .app{display:none;min-height:100vh;flex-direction:column}
-  .app.show{display:flex}
+  .tabs{display:flex;gap:6px;background:#f1f4fa;padding:5px;border-radius:15px;margin-bottom:22px}
+  .tab{
+    flex:1;border:0;background:transparent;padding:10px 8px;border-radius:11px;
+    font-size:12.5px;font-weight:800;color:var(--muted);cursor:pointer;transition:.2s var(--ease);
+  }
+  .tab.active{background:#fff;color:var(--blue);box-shadow:0 4px 14px rgba(16,40,88,.12)}
+  .panel{display:none}
+  .panel.active{display:block;animation:fadeUp .3s var(--ease)}
 
-  .topbar{
-    background:linear-gradient(120deg,#0a1c40,#16367a);
-    color:#fff;padding:14px 22px;
-    display:flex;align-items:center;justify-content:space-between;
-    gap:14px;box-shadow:0 6px 24px rgba(10,28,64,.22);
-    position:sticky;top:0;z-index:40;
+  .top-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:10px}
+  .top-row h3{font-family:"Fraunces",Georgia,serif;font-size:16px;font-weight:600}
+  .user-chip{
+    display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:700;
   }
-  .topbar .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:14px}
-  .topbar .brand-logo{
-    width:36px;height:36px;border-radius:10px;
-    background:#fff;color:var(--blue);display:grid;place-items:center;
-    font-weight:900;font-size:14px;overflow:hidden;
+  .role-pill{
+    padding:3px 10px;border-radius:999px;font-size:10.5px;font-weight:900;letter-spacing:.3px;text-transform:uppercase;
   }
-  .topbar .brand-logo img{width:100%;height:100%;object-fit:cover}
-  .topbar .actions{display:flex;align-items:center;gap:10px}
-  .user-pill{
-    display:flex;align-items:center;gap:7px;
-    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
-    padding:6px 12px;border-radius:999px;font-size:11.5px;font-weight:700;
-  }
-  .user-pill svg{width:13px;height:13px;color:#6de6a5}
-  .btn-logout{
-    border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
-    color:#fff;padding:8px 14px;border-radius:10px;
-    font-size:11.5px;font-weight:800;cursor:pointer;transition:.2s var(--ease);
-  }
-  .btn-logout:hover{background:rgba(255,255,255,.18)}
+  .role-pill.owner{background:#fff1d6;color:#96650b}
+  .role-pill.admin{background:#eaf1ff;color:var(--blue)}
+  .role-pill.anggota{background:#eef1f8;color:#5a6584}
 
-  .container{max-width:1240px;width:100%;margin:0 auto;padding:26px 22px 60px}
-
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
-  .stat{
-    background:#fff;border:1px solid var(--border);border-radius:16px;
-    padding:18px 18px 16px;position:relative;overflow:hidden;
-    box-shadow:0 8px 22px rgba(10,28,64,.05);transition:transform .22s var(--ease);
-  }
-  .stat:hover{transform:translateY(-3px)}
-  .stat::before{content:"";position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--blue2)}
-  .stat.s-diterima::before{background:var(--blue2)}
-  .stat.s-diproses::before{background:var(--gold)}
-  .stat.s-selesai::before{background:var(--green)}
-  .stat.s-total::before{background:var(--navy)}
-  .stat .lbl{
-    font-size:11px;font-weight:800;color:var(--muted);
-    letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;
-  }
-  .stat .num{
-    font-family:"Fraunces",Georgia,serif;font-weight:600;
-    font-size:30px;letter-spacing:-.5px;color:var(--navy);
-  }
-
-  .toolbar{
-    background:#fff;border:1px solid var(--border);border-radius:16px;
-    padding:14px 16px;margin-bottom:18px;
-    display:flex;gap:10px;flex-wrap:wrap;align-items:center;
-    box-shadow:0 6px 20px rgba(10,28,64,.05);
-  }
-  .toolbar .search{flex:1;min-width:220px;position:relative}
-  .toolbar .search svg{
-    position:absolute;left:12px;top:50%;transform:translateY(-50%);
-    width:15px;height:15px;color:var(--muted);pointer-events:none;
-  }
-  .toolbar .search input{padding-left:36px;font-size:13.5px}
-  .filter{
-    border:1.5px solid var(--border);background:#fbfcfe;
-    padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;
-    color:var(--text);cursor:pointer;outline:none;
-  }
-  .filter:focus{border-color:var(--blue2)}
-  .refresh-btn{
-    border:1.5px solid var(--border);background:#fbfcfe;color:var(--text);
-    padding:10px 13px;border-radius:11px;font-size:12.5px;font-weight:800;
-    cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s var(--ease);
-  }
-  .refresh-btn:hover{border-color:var(--blue2);color:var(--blue);background:#f5f8ff}
-  .refresh-btn svg{width:14px;height:14px}
-
-  .list{display:grid;gap:10px}
-  .row{
-    background:#fff;border:1px solid var(--border);border-radius:16px;
-    padding:16px 18px;cursor:pointer;
-    transition:.22s var(--ease);position:relative;
-  }
-  .row:hover{
-    border-color:#c9d9f7;background:#f7faff;
-    transform:translateY(-2px);box-shadow:0 12px 26px rgba(10,28,64,.08);
-  }
-  .row.unread::before{
-    content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;
-    background:var(--gold);border-radius:0 3px 3px 0;
-  }
-  .row-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
-  .row-code{font-family:var(--mono);font-weight:800;font-size:14px;letter-spacing:.6px;color:var(--navy)}
-  .row-date{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
-  .row-preview{
-    margin-top:9px;color:#4a5570;font-size:13px;line-height:1.55;
-    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-  }
-  .row-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .entry{border:1px solid var(--border);border-radius:16px;padding:15px 16px;background:#fbfcfe;margin-bottom:12px}
+  .entry-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .entry-code{font-family:var(--mono);font-weight:800;font-size:14px;letter-spacing:.6px;color:var(--navy)}
+  .entry-date{font-size:11px;color:var(--muted);font-weight:600;margin-top:3px}
+  .entry-meta{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
   .chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:#eef1f8;color:#4a5570}
   .chip.cat{background:#edf4ff;color:var(--blue)}
-  .badge{
-    display:inline-flex;align-items:center;gap:6px;
-    padding:5px 11px;border-radius:999px;
-    font-size:11px;font-weight:800;white-space:nowrap;
-  }
+
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:999px;font-size:11px;font-weight:800;white-space:nowrap;border:0}
   .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
-  .badge.diterima{background:#eef4ff;color:#1557C0}
-  .badge.diproses{background:#fff5e6;color:#b0761a}
-  .badge.selesai{background:#e8f7ef;color:#178a53}
+  .badge.Diterima{background:#eef4ff;color:#1557C0}
+  .badge.Diproses{background:#fff5e6;color:#b0761a}
+  .badge.Selesai{background:#e8f7ef;color:#178a53}
+  select.badge-select{width:auto;padding:6px 10px;font-size:11.5px;font-weight:800;border-radius:999px}
 
-  .backdrop{
-    position:fixed;inset:0;background:rgba(6,15,35,.55);
-    backdrop-filter:blur(3px);z-index:50;opacity:0;pointer-events:none;
-    transition:opacity .3s var(--ease);
-  }
-  .backdrop.show{opacity:1;pointer-events:auto}
+  .isi{margin-top:10px;padding:11px 13px;background:#fff;border:1px solid var(--border);border-radius:11px;font-size:12.5px;line-height:1.6;color:#3d4763}
+  .isi b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:4px}
+  .isi p + b{margin-top:10px}
 
-  .drawer{
-    position:fixed;top:0;right:0;bottom:0;width:min(560px,100vw);
-    background:#fff;z-index:60;transform:translateX(100%);
-    transition:transform .38s var(--ease);
-    display:flex;flex-direction:column;
-    box-shadow:-24px 0 60px rgba(10,28,64,.18);
-  }
-  .drawer.show{transform:translateX(0)}
+  .reply-form{margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)}
+  .reply-form .row{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+  .reply-form textarea{margin-bottom:8px}
 
-  .drawer-head{
-    padding:18px 22px;border-bottom:1px solid var(--border);
-    display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
-    background:linear-gradient(180deg,#fafcff,#fff);
+  .acct-row{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+    border:1px solid var(--border);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:#fbfcfe;
   }
-  .drawer-head .meta{min-width:0}
-  .drawer-head .code{
-    font-family:var(--mono);font-weight:800;font-size:16px;
-    letter-spacing:.8px;color:var(--navy);
-  }
-  .drawer-head .date{font-size:12px;color:var(--muted);font-weight:600;margin-top:3px}
-  .drawer-close{
-    flex:none;border:1px solid var(--border);background:#fff;
-    width:34px;height:34px;border-radius:10px;cursor:pointer;
-    display:grid;place-items:center;color:var(--muted);transition:.2s var(--ease);
-  }
-  .drawer-close:hover{background:#f1f4fa;color:var(--navy)}
+  .acct-info{min-width:0}
+  .acct-info .name{font-weight:800;font-size:13.5px}
+  .acct-info .sub{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .acct-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
+  .acct-actions select{width:auto;padding:7px 10px;font-size:12px;border-radius:10px}
 
-  .drawer-body{flex:1;overflow-y:auto;padding:22px}
+  .empty{text-align:center;padding:30px 16px;color:var(--muted)}
+  .empty h3{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:16px;color:var(--text);margin-bottom:6px}
+  .empty p{font-size:12.5px;line-height:1.6}
 
-  .info-block{
-    background:#fbfcfe;border:1px solid var(--border);
-    border-radius:14px;padding:14px 16px;margin-bottom:14px;
-  }
-  .info-block .lbl{
-    font-size:10.5px;font-weight:800;color:var(--muted);
-    letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px;
-  }
-  .info-block .val{font-size:13.5px;color:var(--text);line-height:1.6;word-break:break-word}
-  .info-block .val.empt{color:#a3aec2;font-style:italic}
-  .info-block .val.pre{white-space:pre-wrap}
+  .hide{display:none !important}
 
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+  footer{text-align:center;color:#7b8799;font-size:11.5px;padding:18px 20px 34px;position:relative;z-index:1;line-height:1.7}
+  footer b{color:var(--blue)}
 
-  .divider{
-    display:flex;align-items:center;gap:12px;
-    margin:22px 0 16px;font-size:11.5px;font-weight:800;
-    letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  .spinner{
+    width:16px;height:16px;border-radius:50%;border:2.5px solid rgba(255,255,255,.35);
+    border-top-color:#fff;animation:spin .7s linear infinite;display:inline-block;
   }
-  .divider::after{content:"";flex:1;height:1px;background:var(--border)}
-
-  .status-group{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-  .status-opt{position:relative}
-  .status-opt input{display:none}
-  .status-opt span{
-    display:flex;align-items:center;justify-content:center;gap:7px;
-    padding:12px 10px;border:1.5px solid var(--border);border-radius:12px;
-    background:#fbfcfe;font-size:12.5px;font-weight:800;cursor:pointer;
-    transition:.2s var(--ease);color:var(--text);
-  }
-  .status-opt span::before{
-    content:"";width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.35;
-  }
-  .status-opt input:checked + span{
-    border-color:var(--blue2);background:#edf4ff;color:var(--blue);
-    box-shadow:inset 0 0 0 1px var(--blue2);
-  }
-  .status-opt input:checked + span::before{opacity:1}
-
-  .reply-actions{display:flex;gap:10px;margin-top:6px}
-  .reply-actions .btn-primary{flex:1}
-  .btn-cancel{
-    border:1.5px solid var(--border);background:#fff;color:var(--text);
-    padding:14px 16px;border-radius:13px;font-size:14px;font-weight:800;cursor:pointer;
-    transition:.2s var(--ease);
-  }
-  .btn-cancel:hover{border-color:#c8cfdd;background:#f8fafd}
-
-  .meta-foot{
-    display:flex;justify-content:space-between;gap:10px;
-    font-size:11px;color:var(--muted);margin-top:14px;flex-wrap:wrap;
-  }
-  .meta-foot span{font-weight:600}
-
-  .toast{
-    position:fixed;left:50%;bottom:24px;
-    transform:translateX(-50%) translateY(20px);
-    background:rgba(14,26,50,.95);color:#fff;
-    padding:12px 18px;border-radius:12px;
-    font-size:13px;font-weight:700;
-    box-shadow:0 16px 40px rgba(0,0,0,.3);
-    display:flex;align-items:center;gap:9px;
-    opacity:0;pointer-events:none;z-index:80;
-    transition:opacity .3s var(--ease),transform .3s var(--ease);
-    max-width:90vw;
-  }
-  .toast svg{flex:none}
-  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-  .toast.success svg{color:#6de6a5}
-  .toast.error svg{color:#ff8f89}
-
-  .empty{
-    text-align:center;padding:50px 20px;color:var(--muted);
-    background:#fff;border:1px dashed var(--border);border-radius:16px;
-  }
-  .empty .ico{
-    width:64px;height:64px;border-radius:50%;margin:0 auto 16px;
-    display:grid;place-items:center;background:#f1f4fa;color:#98a3bb;
-  }
-  .empty h3{
-    font-family:"Fraunces",Georgia,serif;font-weight:600;
-    font-size:17px;color:var(--text);margin-bottom:7px;
-  }
-  .empty p{font-size:13px;max-width:360px;margin:0 auto;line-height:1.6}
-
-  .skeleton{
-    background:linear-gradient(90deg,#eef1f8 25%,#e2e8f4 37%,#eef1f8 63%);
-    background-size:400% 100%;
-    animation:sk 1.3s ease infinite;border-radius:12px;height:96px;
-  }
-  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
-
-  @media(max-width:900px){ .stats{grid-template-columns:repeat(2,1fr)} }
-  @media(max-width:640px){
-    .container{padding:18px 14px 40px}
-    .topbar{padding:12px 14px}
-    .topbar .brand .txt{display:none}
-    .user-pill span{display:none}
-    .stat{padding:14px}
-    .stat .num{font-size:24px}
-    .grid2{grid-template-columns:1fr}
-    .status-group{grid-template-columns:1fr;gap:6px}
-    .drawer-head{padding:16px 18px}
-    .drawer-body{padding:18px}
-  }
+  @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div class="login-wrap" id="loginWrap">
-  <div class="login-card">
-    <div class="login-logo">
-      <img src="images/logo.jpg" alt=""
-           onerror="this.remove();this.parentElement.textContent='AH';">
-    </div>
-    <h1>Panel Admin</h1>
-    <p class="sub">Aspirasi Yayasan Aqilah Hidayah</p>
-
-    <div class="err" id="loginErr" style="display:none"></div>
-
-    <form id="loginForm">
-      <div class="field">
-        <label for="email">Email Admin</label>
-        <input type="email" id="email" placeholder="admin@sekolah.sch.id" autocomplete="username" required>
+  <header class="top">
+    <nav class="reveal">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="images/logo.jpg" alt="Logo" onerror="this.remove();this.parentElement.textContent='AH';">
+        </div>
+        <div>Yayasan Aqilah Hidayah</div>
       </div>
-      <div class="field">
-        <label for="password">Password</label>
-        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+      <div class="nav-badge">
+        <svg class="lock-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>
+        PANEL PENGURUS
       </div>
-      <button class="btn-primary" type="submit" id="loginBtn">
-        <span class="lbl">Masuk</span>
-        <span class="spinner"></span>
-      </button>
-    </form>
-  </div>
-</div>
+    </nav>
+  </header>
 
-<!-- APP -->
-<div class="app" id="app">
-  <div class="topbar">
-    <div class="brand">
-      <div class="brand-logo">
-        <img src="images/logo.jpg" alt=""
-             onerror="this.remove();this.parentElement.textContent='AH';">
-      </div>
-      <span class="txt">Panel Admin · Aspirasi Aqilah</span>
-    </div>
-    <div class="actions">
-      <div class="user-pill" id="userPill">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        <span id="userEmail">—</span>
-      </div>
-      <button class="btn-logout" id="btnLogout">Keluar</button>
-    </div>
-  </div>
+  <main>
+    <div class="card-wrap">
+      <div class="card">
 
-  <div class="container">
-    <div class="stats">
-      <div class="stat s-total">
-        <div class="lbl">Total</div><div class="num" id="statTotal">—</div>
-      </div>
-      <div class="stat s-diterima">
-        <div class="lbl">Diterima</div><div class="num" id="statDiterima">—</div>
-      </div>
-      <div class="stat s-diproses">
-        <div class="lbl">Diproses</div><div class="num" id="statDiproses">—</div>
-      </div>
-      <div class="stat s-selesai">
-        <div class="lbl">Selesai</div><div class="num" id="statSelesai">—</div>
-      </div>
-    </div>
+        <!-- ============ GATE: LOGIN ============ -->
+        <section id="viewLogin">
+          <div class="section-title">
+            <div class="icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg>
+            </div>
+            <div>
+              <h2>Masuk Pengurus</h2>
+              <p>Halaman ini khusus owner, admin, dan anggota yang sudah disetujui.</p>
+            </div>
+          </div>
 
-    <div class="toolbar">
-      <div class="search">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <input type="text" id="searchInput" placeholder="Cari kode DHEKA, isi pesan, jenjang...">
-      </div>
-      <select class="filter" id="filterStatus">
-        <option value="">Semua Status</option>
-        <option value="Diterima">Diterima</option>
-        <option value="Diproses">Diproses</option>
-        <option value="Selesai">Selesai</option>
-      </select>
-      <select class="filter" id="filterKategori">
-        <option value="">Semua Kategori</option>
-        <option value="Saran">Saran</option>
-        <option value="Kritik">Kritik</option>
-        <option value="Ide Kegiatan">Ide Kegiatan</option>
-        <option value="Keluhan">Keluhan</option>
-      </select>
-      <button class="refresh-btn" id="btnRefresh">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
-        Muat ulang
-      </button>
-    </div>
+          <div id="loginMsg"></div>
 
-    <div class="list" id="list">
-      <div class="skeleton" style="height:120px"></div>
-      <div class="skeleton" style="height:120px"></div>
-      <div class="skeleton" style="height:120px"></div>
-    </div>
-  </div>
-</div>
+          <form id="formLogin">
+            <div class="field">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" required autocomplete="username">
+            </div>
+            <div class="field">
+              <label for="loginPass">Kata Sandi</label>
+              <input type="password" id="loginPass" required autocomplete="current-password">
+            </div>
+            <button class="btn" type="submit" id="btnLogin">
+              <span class="btn-label">Masuk</span>
+            </button>
+          </form>
 
-<div class="backdrop" id="backdrop"></div>
+          <div class="switcher">
+            Belum punya akun? <button type="button" id="goRegister">Daftar akun pengurus</button>
+          </div>
+        </section>
 
-<aside class="drawer" id="drawer" role="dialog" aria-hidden="true">
-  <div class="drawer-head">
-    <div class="meta">
-      <div class="code" id="dCode">DHEKA-XXXXXX</div>
-      <div class="date" id="dDate">—</div>
-    </div>
-    <button class="drawer-close" id="dClose" aria-label="Tutup">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-    </button>
-  </div>
+        <!-- ============ GATE: REGISTER ============ -->
+        <section id="viewRegister" class="hide">
+          <div class="section-title">
+            <div class="icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+            </div>
+            <div>
+              <h2>Daftar Akun Pengurus</h2>
+              <p>Akun baru berstatus <b>menunggu</b> sampai disetujui owner.</p>
+            </div>
+          </div>
 
-  <div class="drawer-body">
-    <div class="grid2">
-      <div class="info-block" style="margin:0">
-        <div class="lbl">Jenjang & Kelas</div>
-        <div class="val" id="dJenjang">—</div>
-      </div>
-      <div class="info-block" style="margin:0">
-        <div class="lbl">Kategori</div>
-        <div class="val" id="dKategori">—</div>
-      </div>
-    </div>
+          <div id="registerMsg"></div>
 
-    <div class="info-block">
-      <div class="lbl">Nama (dari pengirim)</div>
-      <div class="val" id="dNama">—</div>
-    </div>
+          <form id="formRegister">
+            <div class="field">
+              <label for="regUsername">Nama Panggilan</label>
+              <input type="text" id="regUsername" required autocomplete="nickname">
+            </div>
+            <div class="field">
+              <label for="regEmail">Email</label>
+              <input type="email" id="regEmail" required autocomplete="email">
+            </div>
+            <div class="field">
+              <label for="regPass">Kata Sandi <small style="font-weight:500;color:var(--muted)">(min. 6 karakter)</small></label>
+              <input type="password" id="regPass" required minlength="6" autocomplete="new-password">
+            </div>
+            <button class="btn" type="submit" id="btnRegister">
+              <span class="btn-label">Daftar</span>
+            </button>
+          </form>
 
-    <div class="info-block">
-      <div class="lbl">Kontak</div>
-      <div class="val" id="dKontak">—</div>
-    </div>
+          <div class="switcher">
+            Sudah punya akun? <button type="button" id="goLogin">Masuk</button>
+          </div>
+        </section>
 
-    <div class="info-block">
-      <div class="lbl">Aspirasi / Pesan</div>
-      <div class="val pre" id="dPesan">—</div>
-    </div>
+        <!-- ============ GATE: PENDING / REJECTED ============ -->
+        <section id="viewPending" class="hide">
+          <div class="empty">
+            <div class="icon" style="margin:0 auto 16px">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+            </div>
+            <h3 id="pendingTitle">Menunggu Persetujuan</h3>
+            <p id="pendingText">Akun kamu sudah terdaftar dan sedang menunggu persetujuan owner. Coba masuk lagi nanti.</p>
+            <button class="btn ghost small" type="button" id="btnLogoutPending" style="margin:16px auto 0">Keluar</button>
+          </div>
+        </section>
 
-    <div class="info-block">
-      <div class="lbl">Usulan / Solusi</div>
-      <div class="val pre" id="dSolusi">—</div>
-    </div>
+        <!-- ============ DASHBOARD ============ -->
+        <section id="viewDashboard" class="hide">
+          <div class="top-row">
+            <div class="user-chip">
+              <span id="userChipName">-</span>
+              <span class="role-pill" id="userRolePill">-</span>
+            </div>
+            <button class="btn ghost small" type="button" id="btnLogout">Keluar</button>
+          </div>
 
-    <div class="divider">Balasan Admin</div>
+          <div class="tabs" role="tablist">
+            <button class="tab active" data-tab="aspirasi" type="button">Aspirasi</button>
+            <button class="tab hide" data-tab="akun" id="tabAkunBtn" type="button">Kelola Akun</button>
+          </div>
 
-    <div class="field">
-      <label>Status Aspirasi</label>
-      <div class="status-group">
-        <label class="status-opt">
-          <input type="radio" name="dStatus" value="Diterima">
-          <span>Diterima</span>
-        </label>
-        <label class="status-opt">
-          <input type="radio" name="dStatus" value="Diproses">
-          <span>Diproses</span>
-        </label>
-        <label class="status-opt">
-          <input type="radio" name="dStatus" value="Selesai">
-          <span>Selesai</span>
-        </label>
+          <!-- PANEL ASPIRASI -->
+          <section class="panel active" id="panelAspirasi">
+            <div id="aspirasiList"><div class="empty"><p>Memuat data...</p></div></div>
+          </section>
+
+          <!-- PANEL KELOLA AKUN (owner only) -->
+          <section class="panel" id="panelAkun">
+            <div id="akunList"><div class="empty"><p>Memuat data...</p></div></div>
+          </section>
+        </section>
+
       </div>
     </div>
+  </main>
 
-    <div class="field">
-      <label for="dBalasan">Teks Balasan</label>
-      <textarea id="dBalasan" placeholder="Tulis balasan untuk siswa..."></textarea>
-    </div>
+  <footer>
+    <b>Panel Pengurus</b> · Yayasan Aqilah Hidayah<br>
+    Halaman ini rahasia — jangan bagikan tautan atau kredensial ke pihak luar.<br>
+    <span style="opacity:.6">Sistem oleh xrezzky</span>
+  </footer>
 
-    <div class="reply-actions">
-      <button class="btn-cancel" id="dReset" type="button">Reset</button>
-      <button class="btn-primary" id="dSave">
-        <span class="lbl">Simpan Balasan</span>
-        <span class="spinner"></span>
-      </button>
-    </div>
-
-    <div class="meta-foot">
-      <span id="dCreated">Dibuat: —</span>
-      <span id="dUpdated">Diperbarui: —</span>
-    </div>
-  </div>
-</aside>
-
-<div class="toast" id="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
-/* ============================================================================
-   BOOTSTRAP — config dari /api/config
-   ============================================================================ */
-let sb = null;
-
-async function loadSupabaseConfig(){
-  const res = await fetch("/api/config", { cache: "no-store" });
-  if(!res.ok){
-    let msg = "Gagal memuat konfigurasi server";
-    try{ const j = await res.json(); if(j && j.error) msg = j.error; }catch(e){}
-    throw new Error(msg);
-  }
-  const cfg = await res.json();
-  if(!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){
-    throw new Error("Konfigurasi Supabase tidak lengkap di server.");
-  }
-  return cfg;
-}
-
-/* ============================================================================
-   UTIL
-   ============================================================================ */
+/* =========================================================
+   0. SUPABASE CLIENT
+   ========================================================= */
 const $  = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
 
@@ -572,379 +330,348 @@ function esc(s){
   ));
 }
 function fmtDate(ts){
-  if(!ts) return "—";
   try{
-    return new Date(ts).toLocaleString("id-ID", {
-      day:"2-digit", month:"short", year:"numeric",
-      hour:"2-digit", minute:"2-digit"
-    });
-  }catch(e){ return new Date(ts).toLocaleString(); }
-}
-function statusBadge(status){
-  const map = { "Diterima":"diterima", "Diproses":"diproses", "Selesai":"selesai" };
-  const s   = status || "Diterima";
-  return `<span class="badge ${map[s] || "diterima"}">${esc(s)}</span>`;
+    return new Date(ts).toLocaleString("id-ID", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" });
+  }catch(e){ return String(ts); }
 }
 
-let toastTimer = null;
-function toast(msg, type = "success"){
-  const t = $("#toast");
-  const iconOk  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
-  const iconErr = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
-  t.className = "toast " + type;
-  t.innerHTML = (type === "error" ? iconErr : iconOk) + `<span>${esc(msg)}</span>`;
-  t.classList.add("show");
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+let supa = null;
+let myProfile = null; // { id, username, role, status }
+
+async function initSupabase(){
+  const res = await fetch("/api/config");
+  const cfg = await res.json();
+  if(!cfg || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){
+    throw new Error("Konfigurasi Supabase tidak lengkap");
+  }
+  supa = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+  return supa;
 }
 
-/* ============================================================================
-   STATE
-   ============================================================================ */
-let allData = [];
-let filteredData = [];
-let currentCode = null;
+/* =========================================================
+   1. VIEW SWITCHING (gate)
+   ========================================================= */
+function showView(id){
+  ["viewLogin","viewRegister","viewPending","viewDashboard"].forEach(v => {
+    $("#" + v).classList.toggle("hide", v !== id);
+  });
+}
 
-const loginWrap = $("#loginWrap");
-const app       = $("#app");
-const loginForm = $("#loginForm");
-const loginBtn  = $("#loginBtn");
-const loginErr  = $("#loginErr");
+function setMsg(el, type, text){
+  el.innerHTML = text ? `<div class="msg ${type}">${esc(text)}</div>` : "";
+}
 
-/* ============================================================================
-   LOGIN
-   ============================================================================ */
-loginForm.addEventListener("submit", async e => {
+/* =========================================================
+   2. AUTH: LOGIN / REGISTER / LOGOUT
+   ========================================================= */
+$("#goRegister").addEventListener("click", () => { showView("viewRegister"); });
+$("#goLogin").addEventListener("click", () => { showView("viewLogin"); });
+
+$("#formLogin").addEventListener("submit", async e => {
   e.preventDefault();
-  loginErr.style.display = "none";
-
-  if(!sb){ loginErr.style.display = "block"; loginErr.textContent = "Server belum siap."; return; }
-
-  const email    = $("#email").value.trim();
-  const password = $("#password").value;
-
-  if(!email || !password){
-    loginErr.style.display = "block";
-    loginErr.textContent = "Email dan password wajib diisi.";
-    return;
-  }
-
-  loginBtn.classList.add("loading");
-  loginBtn.disabled = true;
-
-  try{
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if(error) throw error;
-    if(!data.session) throw new Error("Sesi tidak terbentuk");
-  }catch(err){
-    loginErr.style.display = "block";
-    loginErr.textContent = err.message === "Invalid login credentials"
-      ? "Email atau password salah."
-      : (err.message || "Gagal login.");
-    loginBtn.classList.remove("loading");
-    loginBtn.disabled = false;
-  }
-});
-
-$("#btnLogout").addEventListener("click", async () => {
-  if(sb) await sb.auth.signOut();
-});
-
-/* ============================================================================
-   LOAD DATA
-   ============================================================================ */
-async function loadAspirations(){
-  $("#list").innerHTML = `
-    <div class="skeleton" style="height:120px"></div>
-    <div class="skeleton" style="height:120px"></div>
-    <div class="skeleton" style="height:120px"></div>`;
-
-  try{
-    const { data, error } = await sb
-      .from("aspirations")
-      .select("*")
-      .order("created_at", { ascending: false })
-      .limit(500);
-
-    if(error) throw error;
-    allData = Array.isArray(data) ? data : [];
-    applyFilters();
-    updateStats();
-  }catch(err){
-    console.error(err);
-    $("#list").innerHTML = `
-      <div class="empty">
-        <div class="ico" style="background:#fdf3f2;color:#c8695f">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        </div>
-        <h3>Gagal memuat data</h3>
-        <p>${esc(err.message || "Periksa koneksi dan konfigurasi Supabase.")}</p>
-      </div>`;
-  }
-}
-
-function applyFilters(){
-  const q        = $("#searchInput").value.trim().toLowerCase();
-  const status   = $("#filterStatus").value;
-  const kategori = $("#filterKategori").value;
-
-  filteredData = allData.filter(r => {
-    if(status && r.status !== status) return false;
-    if(kategori && r.kategori !== kategori) return false;
-    if(q){
-      const hay = [r.code, r.pesan, r.solusi, r.jenjang, r.kelas, r.kategori, r.nama]
-        .join(" ").toLowerCase();
-      if(!hay.includes(q)) return false;
-    }
-    return true;
-  });
-
-  renderList();
-}
-
-function renderList(){
-  const wrap = $("#list");
-
-  if(filteredData.length === 0){
-    wrap.innerHTML = `
-      <div class="empty">
-        <div class="ico">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </div>
-        <h3>Tidak ada aspirasi</h3>
-        <p>Coba ubah filter atau kata pencarian.</p>
-      </div>`;
-    return;
-  }
-
-  wrap.innerHTML = filteredData.map(r => {
-    const needsReply = !r.balasan || !r.balasan.trim();
-    return `
-      <div class="row ${needsReply ? "unread" : ""}" data-code="${esc(r.code)}" tabindex="0" role="button">
-        <div class="row-head">
-          <div>
-            <div class="row-code">${esc(r.code)}</div>
-            <div class="row-date">${esc(fmtDate(r.created_at))}</div>
-          </div>
-          ${statusBadge(r.status)}
-        </div>
-        <div class="row-preview">${esc(r.pesan)}</div>
-        <div class="row-meta">
-          <span class="chip cat">${esc(r.kategori)}</span>
-          <span class="chip">${esc(r.jenjang)}${r.kelas ? " · " + esc(r.kelas) : ""}</span>
-          ${needsReply ? '<span class="chip" style="background:#fff5e6;color:#b0761a">Butuh balasan</span>' : ""}
-        </div>
-      </div>`;
-  }).join("");
-
-  $$(".row", wrap).forEach(row => {
-    const open = () => openDrawer(row.dataset.code);
-    row.addEventListener("click", open);
-    row.addEventListener("keydown", e => {
-      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); open(); }
-    });
-  });
-}
-
-function updateStats(){
-  const total    = allData.length;
-  const diterima = allData.filter(r => r.status === "Diterima").length;
-  const diproses = allData.filter(r => r.status === "Diproses").length;
-  const selesai  = allData.filter(r => r.status === "Selesai").length;
-  $("#statTotal").textContent    = total;
-  $("#statDiterima").textContent = diterima;
-  $("#statDiproses").textContent = diproses;
-  $("#statSelesai").textContent  = selesai;
-}
-
-/* ============================================================================
-   DRAWER
-   ============================================================================ */
-const drawer   = $("#drawer");
-const backdrop = $("#backdrop");
-
-function openDrawer(code){
-  const rec = allData.find(r => r.code === code);
-  if(!rec){ toast("Data tidak ditemukan", "error"); return; }
-  currentCode = code;
-
-  $("#dCode").textContent     = rec.code;
-  $("#dDate").textContent     = fmtDate(rec.created_at);
-  $("#dJenjang").textContent  = rec.jenjang + (rec.kelas ? " · " + rec.kelas : "");
-  $("#dKategori").textContent = rec.kategori;
-
-  const nama   = (rec.nama || "").trim();
-  const kontak = (rec.kontak || "").trim();
-
-  const namaEl   = $("#dNama");
-  const kontakEl = $("#dKontak");
-  namaEl.textContent   = nama   || "— tidak diisi —";
-  kontakEl.textContent = kontak || "— tidak diisi —";
-  namaEl.classList.toggle("empt", !nama);
-  kontakEl.classList.toggle("empt", !kontak);
-
-  $("#dPesan").textContent  = rec.pesan;
-  $("#dSolusi").textContent = rec.solusi;
-
-  $$('input[name="dStatus"]').forEach(inp => {
-    inp.checked = inp.value === (rec.status || "Diterima");
-  });
-  $("#dBalasan").value = rec.balasan || "";
-
-  $("#dCreated").textContent = "Dibuat: " + fmtDate(rec.created_at);
-  $("#dUpdated").textContent = "Diperbarui: " + fmtDate(rec.updated_at || rec.created_at);
-
-  backdrop.classList.add("show");
-  drawer.classList.add("show");
-  drawer.setAttribute("aria-hidden", "false");
-
-  setTimeout(() => $("#dBalasan").focus(), 320);
-}
-
-function closeDrawer(){
-  drawer.classList.remove("show");
-  backdrop.classList.remove("show");
-  drawer.setAttribute("aria-hidden", "true");
-  currentCode = null;
-}
-
-$("#dClose").addEventListener("click", closeDrawer);
-backdrop.addEventListener("click", closeDrawer);
-document.addEventListener("keydown", e => {
-  if(e.key === "Escape" && drawer.classList.contains("show")) closeDrawer();
-});
-
-$("#dReset").addEventListener("click", () => {
-  if(!currentCode) return;
-  const rec = allData.find(r => r.code === currentCode);
-  if(!rec) return;
-  $$('input[name="dStatus"]').forEach(inp => {
-    inp.checked = inp.value === (rec.status || "Diterima");
-  });
-  $("#dBalasan").value = rec.balasan || "";
-  toast("Form direset ke nilai tersimpan");
-});
-
-/* ============================================================================
-   SIMPAN BALASAN
-   ============================================================================ */
-$("#dSave").addEventListener("click", async () => {
-  if(!currentCode){ toast("Tidak ada data terpilih", "error"); return; }
-  if(!sb){ toast("Server belum siap", "error"); return; }
-
-  const btn     = $("#dSave");
-  const status  = ($('input[name="dStatus"]:checked') || {}).value;
-  const balasan = $("#dBalasan").value.trim();
-
-  if(!status){ toast("Pilih status terlebih dahulu", "error"); return; }
-
-  btn.classList.add("loading");
+  const msgEl = $("#loginMsg");
+  setMsg(msgEl, "", "");
+  const btn = $("#btnLogin");
   btn.disabled = true;
 
-  const rec = allData.find(r => r.code === currentCode);
-  const payload = {
-    status,
-    balasan,
-    balasan_at: balasan ? new Date().toISOString() : null
-  };
+  const email = $("#loginEmail").value.trim();
+  const pass  = $("#loginPass").value;
 
-  try{
-    const { error } = await sb
-      .from("aspirations")
-      .update(payload)
-      .eq("code", currentCode);
+  const { error } = await supa.auth.signInWithPassword({ email, password: pass });
 
-    if(error) throw error;
-
-    if(rec){
-      Object.assign(rec, payload);
-      rec.updated_at = new Date().toISOString();
-    }
-
-    updateStats();
-    applyFilters();
-
-    toast("Balasan berhasil disimpan");
-    $("#dUpdated").textContent = "Diperbarui: " + fmtDate(new Date().toISOString());
-  }catch(err){
-    console.error(err);
-    toast(err.message || "Gagal menyimpan balasan", "error");
-  }finally{
-    btn.classList.remove("loading");
+  if(error){
+    setMsg(msgEl, "error", "Email atau kata sandi salah, atau akun belum terverifikasi.");
     btn.disabled = false;
+    return;
   }
+
+  await afterAuthResolved();
+  btn.disabled = false;
 });
 
-/* ============================================================================
-   FILTER
-   ============================================================================ */
-let searchTimer = null;
-$("#searchInput").addEventListener("input", () => {
-  clearTimeout(searchTimer);
-  searchTimer = setTimeout(applyFilters, 180);
+$("#formRegister").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msgEl = $("#registerMsg");
+  setMsg(msgEl, "", "");
+  const btn = $("#btnRegister");
+  btn.disabled = true;
+
+  const username = $("#regUsername").value.trim();
+  const email    = $("#regEmail").value.trim();
+  const pass     = $("#regPass").value;
+
+  const { error } = await supa.auth.signUp({
+    email, password: pass,
+    options: { data: { username } }
+  });
+
+  if(error){
+    setMsg(msgEl, "error", error.message === "User already registered"
+      ? "Email ini sudah terdaftar. Coba masuk."
+      : "Pendaftaran gagal: " + error.message);
+    btn.disabled = false;
+    return;
+  }
+
+  setMsg(msgEl, "ok", "Pendaftaran berhasil! Akun kamu berstatus menunggu — hubungi owner untuk disetujui.");
+  $("#formRegister").reset();
+  btn.disabled = false;
 });
-$("#filterStatus").addEventListener("change", applyFilters);
-$("#filterKategori").addEventListener("change", applyFilters);
-$("#btnRefresh").addEventListener("click", () => loadAspirations());
 
-/* ============================================================================
-   BOOTSTRAP INIT
-   ============================================================================ */
-(async () => {
-  try{
-    const cfg = await loadSupabaseConfig();
-    sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+async function doLogout(){
+  await supa.auth.signOut();
+  myProfile = null;
+  $("#formLogin").reset();
+  showView("viewLogin");
+}
+$("#btnLogout").addEventListener("click", doLogout);
+$("#btnLogoutPending").addEventListener("click", doLogout);
 
-    // Auth listener
-    sb.auth.onAuthStateChange((event, session) => {
-      if(session && session.user){
-        loginWrap.style.display = "none";
-        app.classList.add("show");
-        $("#userEmail").textContent = session.user.email || "admin";
-        loginBtn.classList.remove("loading");
-        loginBtn.disabled = false;
-        loadAspirations();
-      }else{
-        loginWrap.style.display = "grid";
-        app.classList.remove("show");
-        loginBtn.classList.remove("loading");
-        loginBtn.disabled = false;
-        closeDrawer();
-      }
+/* =========================================================
+   3. RESOLVE SESSION -> PROFILE -> GATE
+   ========================================================= */
+async function afterAuthResolved(){
+  const { data: { user } } = await supa.auth.getUser();
+  if(!user){ showView("viewLogin"); return; }
+
+  const { data: profile, error } = await supa
+    .from("profiles")
+    .select("id, username, role, status")
+    .eq("id", user.id)
+    .single();
+
+  if(error || !profile){
+    setMsg($("#loginMsg"), "error", "Profil akun tidak ditemukan. Hubungi owner.");
+    await supa.auth.signOut();
+    showView("viewLogin");
+    return;
+  }
+
+  myProfile = profile;
+
+  if(profile.status === "pending"){
+    $("#pendingTitle").textContent = "Menunggu Persetujuan";
+    $("#pendingText").textContent = "Akun kamu (" + profile.username + ") sudah terdaftar dan sedang menunggu persetujuan owner. Coba masuk lagi nanti.";
+    showView("viewPending");
+    return;
+  }
+  if(profile.status === "rejected"){
+    $("#pendingTitle").textContent = "Akses Ditolak";
+    $("#pendingText").textContent = "Akun kamu tidak diberi akses ke panel ini. Hubungi owner jika ini keliru.";
+    showView("viewPending");
+    return;
+  }
+
+  // approved
+  $("#userChipName").textContent = profile.username;
+  const pill = $("#userRolePill");
+  pill.textContent = profile.role;
+  pill.className = "role-pill " + profile.role;
+
+  $("#tabAkunBtn").classList.toggle("hide", profile.role !== "owner");
+  if(profile.role !== "owner" && $("#tabAkunBtn").classList.contains("active")){
+    switchDashTab("aspirasi");
+  }
+
+  showView("viewDashboard");
+  loadAspirasi();
+  if(profile.role === "owner") loadAkun();
+}
+
+/* =========================================================
+   4. DASHBOARD TABS
+   ========================================================= */
+function switchDashTab(name){
+  $$(".tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
+  $("#panelAspirasi").classList.toggle("active", name === "aspirasi");
+  $("#panelAkun").classList.toggle("active", name === "akun");
+}
+$$(".tab").forEach(t => t.addEventListener("click", () => switchDashTab(t.dataset.tab)));
+
+/* =========================================================
+   5. PANEL ASPIRASI
+   ========================================================= */
+function statusBadgeSelect(current, code){
+  const opts = ["Diterima","Diproses","Selesai"].map(s =>
+    `<option value="${s}" ${s===current ? "selected":""}>${s}</option>`
+  ).join("");
+  return `<select class="badge-select badge ${esc(current)}" data-code="${esc(code)}" data-field="status">${opts}</select>`;
+}
+
+async function loadAspirasi(){
+  const wrap = $("#aspirasiList");
+  wrap.innerHTML = `<div class="empty"><p>Memuat data...</p></div>`;
+
+  const { data, error } = await supa
+    .from("aspirasi")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if(error){
+    wrap.innerHTML = `<div class="msg error">Gagal memuat data: ${esc(error.message)}</div>`;
+    return;
+  }
+
+  if(!data || data.length === 0){
+    wrap.innerHTML = `<div class="empty"><h3>Belum ada aspirasi</h3><p>Aspirasi yang masuk dari situs publik akan muncul di sini.</p></div>`;
+    return;
+  }
+
+  const canManage = myProfile.role === "owner" || myProfile.role === "admin";
+  const isOwner = myProfile.role === "owner";
+
+  wrap.innerHTML = data.map(r => `
+    <div class="entry" data-code="${esc(r.code)}">
+      <div class="entry-head">
+        <div>
+          <div class="entry-code">${esc(r.code)}</div>
+          <div class="entry-date">${esc(fmtDate(r.created_at))}</div>
+        </div>
+        ${canManage ? statusBadgeSelect(r.status, r.code) : `<span class="badge ${esc(r.status)}">${esc(r.status)}</span>`}
+      </div>
+      <div class="entry-meta">
+        <span class="chip cat">${esc(r.kategori)}</span>
+        <span class="chip">${esc(r.jenjang)}${r.kelas ? " · " + esc(r.kelas) : ""}</span>
+        ${isOwner || myProfile.role === "admin"
+          ? (r.nama ? `<span class="chip">${esc(r.nama)}</span>` : "")
+          + (r.kontak ? `<span class="chip">${esc(r.kontak)}</span>` : "")
+          : ""}
+      </div>
+      <div class="isi">
+        <b>Aspirasi / Pesan</b><p>${esc(r.pesan)}</p>
+        <b>Usulan / Solusi</b><p>${esc(r.solusi)}</p>
+      </div>
+      ${canManage ? `
+        <div class="reply-form">
+          <label>Balasan Admin</label>
+          <textarea data-code="${esc(r.code)}" data-field="balasan" placeholder="Tulis balasan untuk pengirim...">${esc(r.balasan || "")}</textarea>
+          <div class="row">
+            <button class="btn small" type="button" data-save="${esc(r.code)}">Simpan Balasan &amp; Status</button>
+            ${isOwner ? `<button class="btn danger small" type="button" data-delete="${esc(r.code)}">Hapus</button>` : ""}
+          </div>
+        </div>
+      ` : (r.balasan ? `<div class="isi"><b>Balasan Admin</b><p>${esc(r.balasan)}</p></div>` : "")}
+    </div>
+  `).join("");
+
+  // simpan balasan+status
+  $$("[data-save]", wrap).forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const code = btn.dataset.save;
+      const entry = wrap.querySelector(`.entry[data-code="${CSS.escape(code)}"]`);
+      const status = entry.querySelector('[data-field="status"]').value;
+      const balasan = entry.querySelector('[data-field="balasan"]').value;
+
+      btn.disabled = true;
+      const { error } = await supa.from("aspirasi").update({ status, balasan }).eq("code", code);
+      btn.disabled = false;
+
+      if(error){ alert("Gagal menyimpan: " + error.message); return; }
+      const badge = entry.querySelector(".badge-select");
+      if(badge){ badge.className = "badge-select badge " + status; }
     });
+  });
 
-    // Realtime (opsional)
-    sb.channel("admin-aspirations")
-      .on("postgres_changes",
-          { event: "*", schema: "public", table: "aspirations" },
-          payload => {
-            if(payload.eventType === "INSERT"){
-              if(!allData.some(r => r.code === payload.new.code)){
-                allData.unshift(payload.new);
-              }
-            }else if(payload.eventType === "UPDATE"){
-              const i = allData.findIndex(r => r.code === payload.new.code);
-              if(i >= 0) allData[i] = payload.new;
-            }else if(payload.eventType === "DELETE"){
-              allData = allData.filter(r => r.code !== payload.old.code);
-            }
-            updateStats();
-            applyFilters();
-          })
-      .subscribe();
+  // hapus
+  $$("[data-delete]", wrap).forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const code = btn.dataset.delete;
+      if(!confirm("Hapus aspirasi " + code + "? Tindakan ini tidak bisa dibatalkan.")) return;
+      const { error } = await supa.from("aspirasi").delete().eq("code", code);
+      if(error){ alert("Gagal menghapus: " + error.message); return; }
+      loadAspirasi();
+    });
+  });
+}
 
-    // Cek sesi
-    const { data } = await sb.auth.getSession();
-    if(!data.session) loginWrap.style.display = "grid";
+/* =========================================================
+   6. PANEL KELOLA AKUN (owner only)
+   ========================================================= */
+async function loadAkun(){
+  const wrap = $("#akunList");
+  wrap.innerHTML = `<div class="empty"><p>Memuat data...</p></div>`;
 
-  }catch(err){
-    console.error(err);
-    loginErr.style.display = "block";
-    loginErr.textContent = err.message || "Tidak bisa terhubung ke server.";
-    loginBtn.disabled = true;
+  const { data, error } = await supa
+    .from("profiles")
+    .select("id, username, email, role, status, created_at")
+    .order("created_at", { ascending: true });
+
+  if(error){
+    wrap.innerHTML = `<div class="msg error">Gagal memuat akun: ${esc(error.message)}</div>`;
+    return;
+  }
+
+  if(!data || data.length === 0){
+    wrap.innerHTML = `<div class="empty"><h3>Belum ada akun</h3></div>`;
+    return;
+  }
+
+  const meId = myProfile.id;
+
+  wrap.innerHTML = data.map(p => `
+    <div class="acct-row" data-id="${esc(p.id)}">
+      <div class="acct-info">
+        <div class="name">${esc(p.username)} ${p.id === meId ? '<span style="color:var(--muted);font-weight:600">(kamu)</span>' : ""}</div>
+        <div class="sub">${esc(p.email || "-")} · daftar ${esc(fmtDate(p.created_at))}</div>
+      </div>
+      <div class="acct-actions">
+        <span class="role-pill ${esc(p.role)}">${esc(p.role)}</span>
+        <span class="chip">${esc(p.status)}</span>
+        ${p.id === meId ? "" : `
+          <select data-role="${esc(p.id)}">
+            <option value="anggota" ${p.role==="anggota"?"selected":""}>anggota</option>
+            <option value="admin" ${p.role==="admin"?"selected":""}>admin</option>
+            <option value="owner" ${p.role==="owner"?"selected":""}>owner</option>
+          </select>
+          <select data-status="${esc(p.id)}">
+            <option value="pending" ${p.status==="pending"?"selected":""}>pending</option>
+            <option value="approved" ${p.status==="approved"?"selected":""}>approved</option>
+            <option value="rejected" ${p.status==="rejected"?"selected":""}>rejected</option>
+          </select>
+          <button class="btn small" type="button" data-save-acct="${esc(p.id)}">Simpan</button>
+        `}
+      </div>
+    </div>
+  `).join("");
+
+  $$("[data-save-acct]", wrap).forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.saveAcct;
+      const role = wrap.querySelector(`[data-role="${CSS.escape(id)}"]`).value;
+      const status = wrap.querySelector(`[data-status="${CSS.escape(id)}"]`).value;
+
+      btn.disabled = true;
+      const { error } = await supa.from("profiles").update({ role, status }).eq("id", id);
+      btn.disabled = false;
+
+      if(error){ alert("Gagal menyimpan akun: " + error.message); return; }
+      loadAkun();
+    });
+  });
+}
+
+/* =========================================================
+   7. INIT
+   ========================================================= */
+(async function init(){
+  try{
+    await initSupabase();
+  }catch(e){
+    setMsg($("#loginMsg"), "error", "Gagal memuat konfigurasi server. Coba muat ulang halaman.");
+    return;
+  }
+
+  supa.auth.onAuthStateChange((_event, _session) => {
+    // no-op: kita resolve manual lewat afterAuthResolved() supaya kontrol alur jelas
+  });
+
+  const { data: { session } } = await supa.auth.getSession();
+  if(session){
+    await afterAuthResolved();
+  }else{
+    showView("viewLogin");
   }
 })();
 </script>
-
 </body>
-  </html>
+</html>
