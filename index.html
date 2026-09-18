@@ -785,6 +785,8 @@
                 <span>Identitas bersifat opsional. Gunakan bahasa yang sopan dan sampaikan masukan secara bertanggung jawab.</span>
               </div>
 
+              <div id="submitErrorBox"></div>
+
               <button class="submit" type="submit">
                 <span class="btn-label">Kirim Aspirasi</span>
                 <svg class="arrow" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
@@ -1380,6 +1382,19 @@ $("#clearDraftBtn").addEventListener("click", () => {
 let lastCode = "";
 let formLoadedAt = Date.now(); // dipakai anti-bot: cek jeda waktu pengisian
 
+function showSubmitError(msg){
+  const box = $("#submitErrorBox");
+  box.innerHTML = `
+    <div class="error-box" style="margin-bottom:16px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span>${esc(msg)}</span>
+    </div>`;
+  box.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "center" });
+}
+function clearSubmitError(){
+  $("#submitErrorBox").innerHTML = "";
+}
+
 form.addEventListener("submit", async e => {
   e.preventDefault();
 
@@ -1412,6 +1427,7 @@ form.addEventListener("submit", async e => {
 
   submitBtn.classList.add("loading");
   submitBtn.disabled = true;
+  clearSubmitError();
 
   const payload = {
     kategori : form.querySelector('input[name="kategori"]:checked').value,
@@ -1443,7 +1459,7 @@ form.addEventListener("submit", async e => {
     console.error(sendError);
     submitBtn.classList.remove("loading");
     submitBtn.disabled = false;
-    alert(sendError || "Gagal mengirim aspirasi. Coba lagi.");
+    showSubmitError(sendError || "Gagal mengirim aspirasi. Coba lagi.");
     return;
   }
 
@@ -1739,8 +1755,10 @@ function resetForm(){
   success.classList.remove("show");
   formArea.style.display = "block";
   draftBanner.classList.remove("show");
+  clearSubmitError();
   clearDraft();
   updateProgress();
+  formLoadedAt = Date.now();
   window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
 }
 window.resetForm = resetForm;
