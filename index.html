@@ -1398,30 +1398,28 @@ form.addEventListener("submit", async e => {
   }
 
   const payload = {
-    kategori : form.querySelector('input[name="kategori"]:checked').value,
-    jenjang  : jenjangHidden.value,
-    kelas    : kelasHidden.value,
-    pesan    : pesanEl.value.trim(),
-    solusi   : solusiEl.value.trim(),
-    nama     : namaEl.value.trim(),
-    kontak   : kontakEl.value.trim()
+    p_kategori : form.querySelector('input[name="kategori"]:checked').value,
+    p_jenjang  : jenjangHidden.value,
+    p_kelas    : kelasHidden.value,
+    p_pesan    : pesanEl.value.trim(),
+    p_solusi   : solusiEl.value.trim(),
+    p_nama     : namaEl.value.trim(),
+    p_kontak   : kontakEl.value.trim()
   };
 
-  const { data, error } = await client
-    .from("aspirasi")
-    .insert(payload)
-    .select("code")
-    .single();
+  const { data, error } = await client.rpc("kirim_aspirasi", payload);
 
   if(error || !data){
     console.error(error);
     submitBtn.classList.remove("loading");
     submitBtn.disabled = false;
-    alert("Gagal mengirim aspirasi. Periksa koneksi internet kamu dan coba lagi.");
+    alert(error && error.message
+      ? "Gagal mengirim aspirasi: " + error.message
+      : "Gagal mengirim aspirasi. Periksa koneksi internet kamu dan coba lagi.");
     return;
   }
 
-  const code = data.code;
+  const code = data;
   lastCode = code;
   addMyCode(code);
 
@@ -1730,4 +1728,4 @@ renderRiwayat();
 </script>
 
 </body>
-  </html>
+        </html>
