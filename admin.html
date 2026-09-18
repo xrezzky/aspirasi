@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0B1E42">
+<title>Admin · Aspirasi Aqilah Hidayah</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --navy:#0a1c40; --navy2:#132c5c; --blue:#1557C0; --blue2:#2f6bed;
+    --gold:#eeb43f; --gold-dim:#f6d38a; --green:#178a53;
+    --bg:#f4f6fb; --text:#0f1b32; --muted:#69738c; --card:#fff;
+    --border:#e6eaf3; --shadow:0 24px 60px rgba(10,28,64,.14);
+    --ease:cubic-bezier(.22,1,.36,1);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:var(--bg);color:var(--text);overflow-x:hidden;
+  }
+  button,input,textarea,select{font:inherit}
+  ::selection{background:rgba(238,180,63,.35)}
+
+  /* LOGIN */
+  .login-wrap{
+    min-height:100vh;display:grid;place-items:center;padding:24px;
+    background:
+      radial-gradient(900px 480px at 15% -10%, rgba(238,180,63,.18), transparent 60%),
+      linear-gradient(160deg,#081633,var(--navy) 55%,var(--navy2));
+  }
+  .login-card{
+    width:100%;max-width:400px;background:#fff;border-radius:22px;
+    box-shadow:0 30px 70px rgba(0,0,0,.35);
+    padding:34px 30px 30px;position:relative;overflow:hidden;
+  }
+  .login-card::before{
+    content:"";position:absolute;top:0;left:0;right:0;height:4px;
+    background:linear-gradient(90deg,var(--gold),var(--blue2) 60%,var(--navy2));
+  }
+  .login-logo{
+    width:60px;height:60px;border-radius:16px;
+    background:linear-gradient(155deg,#fff,#eef3ff);color:var(--blue);
+    display:grid;place-items:center;margin:0 auto 16px;
+    box-shadow:0 12px 30px rgba(21,87,192,.2), inset 0 0 0 1px rgba(21,87,192,.08);
+    font-weight:900;font-size:20px;overflow:hidden;
+  }
+  .login-logo img{width:100%;height:100%;object-fit:cover}
+  .login-card h1{
+    font-family:"Fraunces",Georgia,serif;font-weight:600;
+    font-size:24px;text-align:center;letter-spacing:-.3px;margin-bottom:6px;
+  }
+  .login-card .sub{text-align:center;color:var(--muted);font-size:13px;margin-bottom:26px}
+
+  label{display:block;font-size:12.5px;font-weight:800;margin-bottom:7px;letter-spacing:.1px}
+  input,textarea,select{
+    width:100%;border:1.5px solid var(--border);background:#fbfcfe;
+    border-radius:12px;padding:12px 13px;outline:none;color:var(--text);
+    transition:border-color .2s,box-shadow .2s,background .2s;font-size:14px;
+  }
+  textarea{min-height:110px;resize:vertical;line-height:1.55}
+  input:focus,textarea:focus,select:focus{
+    border-color:var(--blue2);box-shadow:0 0 0 4px rgba(47,107,237,.12);background:#fff;
+  }
+  .field{margin-bottom:16px}
+
+  .btn-primary{
+    width:100%;border:0;padding:14px;border-radius:13px;
+    background:linear-gradient(135deg,var(--blue2),var(--blue));
+    color:#fff;font-weight:900;font-size:14.5px;cursor:pointer;
+    box-shadow:0 12px 24px rgba(21,87,192,.26);
+    transition:transform .2s var(--ease),box-shadow .2s var(--ease);
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 30px rgba(21,87,192,.32)}
+  .btn-primary[disabled]{opacity:.65;cursor:default;transform:none}
+
+  .spinner{
+    width:16px;height:16px;border-radius:50%;
+    border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;
+    animation:spin .7s linear infinite;display:none;
+  }
+  .btn-primary.loading .spinner{display:inline-block}
+  .btn-primary.loading .lbl{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .err{
+    background:#fdf3f2;border:1px solid #f5d6d3;color:#a5342c;
+    padding:10px 12px;border-radius:10px;font-size:12.5px;margin-bottom:14px;
+    line-height:1.5;
+  }
+
+  /* APP */
+  .app{display:none;min-height:100vh;flex-direction:column}
+  .app.show{display:flex}
+
+  .topbar{
+    background:linear-gradient(120deg,#0a1c40,#16367a);
+    color:#fff;padding:14px 22px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:14px;box-shadow:0 6px 24px rgba(10,28,64,.22);
+    position:sticky;top:0;z-index:40;
+  }
+  .topbar .brand{display:flex;align-items:center;gap:11px;font-weight:800;font-size:14px}
+  .topbar .brand-logo{
+    width:36px;height:36px;border-radius:10px;
+    background:#fff;color:var(--blue);display:grid;place-items:center;
+    font-weight:900;font-size:14px;overflow:hidden;
+  }
+  .topbar .brand-logo img{width:100%;height:100%;object-fit:cover}
+  .topbar .actions{display:flex;align-items:center;gap:10px}
+  .user-pill{
+    display:flex;align-items:center;gap:7px;
+    background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+    padding:6px 12px;border-radius:999px;font-size:11.5px;font-weight:700;
+  }
+  .user-pill svg{width:13px;height:13px;color:#6de6a5}
+  .btn-logout{
+    border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);
+    color:#fff;padding:8px 14px;border-radius:10px;
+    font-size:11.5px;font-weight:800;cursor:pointer;transition:.2s var(--ease);
+  }
+  .btn-logout:hover{background:rgba(255,255,255,.18)}
+
+  .container{max-width:1240px;width:100%;margin:0 auto;padding:26px 22px 60px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+  .stat{
+    background:#fff;border:1px solid var(--border);border-radius:16px;
+    padding:18px 18px 16px;position:relative;overflow:hidden;
+    box-shadow:0 8px 22px rgba(10,28,64,.05);transition:transform .22s var(--ease);
+  }
+  .stat:hover{transform:translateY(-3px)}
+  .stat::before{content:"";position:absolute;top:0;left:0;bottom:0;width:4px;background:var(--blue2)}
+  .stat.s-diterima::before{background:var(--blue2)}
+  .stat.s-diproses::before{background:var(--gold)}
+  .stat.s-selesai::before{background:var(--green)}
+  .stat.s-total::before{background:var(--navy)}
+  .stat .lbl{
+    font-size:11px;font-weight:800;color:var(--muted);
+    letter-spacing:.6px;text-transform:uppercase;margin-bottom:6px;
+  }
+  .stat .num{
+    font-family:"Fraunces",Georgia,serif;font-weight:600;
+    font-size:30px;letter-spacing:-.5px;color:var(--navy);
+  }
+
+  .toolbar{
+    background:#fff;border:1px solid var(--border);border-radius:16px;
+    padding:14px 16px;margin-bottom:18px;
+    display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+    box-shadow:0 6px 20px rgba(10,28,64,.05);
+  }
+  .toolbar .search{flex:1;min-width:220px;position:relative}
+  .toolbar .search svg{
+    position:absolute;left:12px;top:50%;transform:translateY(-50%);
+    width:15px;height:15px;color:var(--muted);pointer-events:none;
+  }
+  .toolbar .search input{padding-left:36px;font-size:13.5px}
+  .filter{
+    border:1.5px solid var(--border);background:#fbfcfe;
+    padding:10px 12px;border-radius:11px;font-size:13px;font-weight:700;
+    color:var(--text);cursor:pointer;outline:none;
+  }
+  .filter:focus{border-color:var(--blue2)}
+  .refresh-btn{
+    border:1.5px solid var(--border);background:#fbfcfe;color:var(--text);
+    padding:10px 13px;border-radius:11px;font-size:12.5px;font-weight:800;
+    cursor:pointer;display:flex;align-items:center;gap:7px;transition:.2s var(--ease);
+  }
+  .refresh-btn:hover{border-color:var(--blue2);color:var(--blue);background:#f5f8ff}
+  .refresh-btn svg{width:14px;height:14px}
+
+  .list{display:grid;gap:10px}
+  .row{
+    background:#fff;border:1px solid var(--border);border-radius:16px;
+    padding:16px 18px;cursor:pointer;
+    transition:.22s var(--ease);position:relative;
+  }
+  .row:hover{
+    border-color:#c9d9f7;background:#f7faff;
+    transform:translateY(-2px);box-shadow:0 12px 26px rgba(10,28,64,.08);
+  }
+  .row.unread::before{
+    content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;
+    background:var(--gold);border-radius:0 3px 3px 0;
+  }
+  .row-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+  .row-code{font-family:var(--mono);font-weight:800;font-size:14px;letter-spacing:.6px;color:var(--navy)}
+  .row-date{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+  .row-preview{
+    margin-top:9px;color:#4a5570;font-size:13px;line-height:1.55;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .row-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:11px}
+  .chip{font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:#eef1f8;color:#4a5570}
+  .chip.cat{background:#edf4ff;color:var(--blue)}
+  .badge{
+    display:inline-flex;align-items:center;gap:6px;
+    padding:5px 11px;border-radius:999px;
+    font-size:11px;font-weight:800;white-space:nowrap;
+  }
+  .badge::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+  .badge.diterima{background:#eef4ff;color:#1557C0}
+  .badge.diproses{background:#fff5e6;color:#b0761a}
+  .badge.selesai{background:#e8f7ef;color:#178a53}
+
+  .backdrop{
+    position:fixed;inset:0;background:rgba(6,15,35,.55);
+    backdrop-filter:blur(3px);z-index:50;opacity:0;pointer-events:none;
+    transition:opacity .3s var(--ease);
+  }
+  .backdrop.show{opacity:1;pointer-events:auto}
+
+  .drawer{
+    position:fixed;top:0;right:0;bottom:0;width:min(560px,100vw);
+    background:#fff;z-index:60;transform:translateX(100%);
+    transition:transform .38s var(--ease);
+    display:flex;flex-direction:column;
+    box-shadow:-24px 0 60px rgba(10,28,64,.18);
+  }
+  .drawer.show{transform:translateX(0)}
+
+  .drawer-head{
+    padding:18px 22px;border-bottom:1px solid var(--border);
+    display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+    background:linear-gradient(180deg,#fafcff,#fff);
+  }
+  .drawer-head .meta{min-width:0}
+  .drawer-head .code{
+    font-family:var(--mono);font-weight:800;font-size:16px;
+    letter-spacing:.8px;color:var(--navy);
+  }
+  .drawer-head .date{font-size:12px;color:var(--muted);font-weight:600;margin-top:3px}
+  .drawer-close{
+    flex:none;border:1px solid var(--border);background:#fff;
+    width:34px;height:34px;border-radius:10px;cursor:pointer;
+    display:grid;place-items:center;color:var(--muted);transition:.2s var(--ease);
+  }
+  .drawer-close:hover{background:#f1f4fa;color:var(--navy)}
+
+  .drawer-body{flex:1;overflow-y:auto;padding:22px}
+
+  .info-block{
+    background:#fbfcfe;border:1px solid var(--border);
+    border-radius:14px;padding:14px 16px;margin-bottom:14px;
+  }
+  .info-block .lbl{
+    font-size:10.5px;font-weight:800;color:var(--muted);
+    letter-spacing:.7px;text-transform:uppercase;margin-bottom:5px;
+  }
+  .info-block .val{font-size:13.5px;color:var(--text);line-height:1.6;word-break:break-word}
+  .info-block .val.empt{color:#a3aec2;font-style:italic}
+  .info-block .val.pre{white-space:pre-wrap}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+
+  .divider{
+    display:flex;align-items:center;gap:12px;
+    margin:22px 0 16px;font-size:11.5px;font-weight:800;
+    letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+  }
+  .divider::after{content:"";flex:1;height:1px;background:var(--border)}
+
+  .status-group{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+  .status-opt{position:relative}
+  .status-opt input{display:none}
+  .status-opt span{
+    display:flex;align-items:center;justify-content:center;gap:7px;
+    padding:12px 10px;border:1.5px solid var(--border);border-radius:12px;
+    background:#fbfcfe;font-size:12.5px;font-weight:800;cursor:pointer;
+    transition:.2s var(--ease);color:var(--text);
+  }
+  .status-opt span::before{
+    content:"";width:8px;height:8px;border-radius:50%;background:currentColor;opacity:.35;
+  }
+  .status-opt input:checked + span{
+    border-color:var(--blue2);background:#edf4ff;color:var(--blue);
+    box-shadow:inset 0 0 0 1px var(--blue2);
+  }
+  .status-opt input:checked + span::before{opacity:1}
+
+  .reply-actions{display:flex;gap:10px;margin-top:6px}
+  .reply-actions .btn-primary{flex:1}
+  .btn-cancel{
+    border:1.5px solid var(--border);background:#fff;color:var(--text);
+    padding:14px 16px;border-radius:13px;font-size:14px;font-weight:800;cursor:pointer;
+    transition:.2s var(--ease);
+  }
+  .btn-cancel:hover{border-color:#c8cfdd;background:#f8fafd}
+
+  .meta-foot{
+    display:flex;justify-content:space-between;gap:10px;
+    font-size:11px;color:var(--muted);margin-top:14px;flex-wrap:wrap;
+  }
+  .meta-foot span{font-weight:600}
+
+  .toast{
+    position:fixed;left:50%;bottom:24px;
+    transform:translateX(-50%) translateY(20px);
+    background:rgba(14,26,50,.95);color:#fff;
+    padding:12px 18px;border-radius:12px;
+    font-size:13px;font-weight:700;
+    box-shadow:0 16px 40px rgba(0,0,0,.3);
+    display:flex;align-items:center;gap:9px;
+    opacity:0;pointer-events:none;z-index:80;
+    transition:opacity .3s var(--ease),transform .3s var(--ease);
+    max-width:90vw;
+  }
+  .toast svg{flex:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.success svg{color:#6de6a5}
+  .toast.error svg{color:#ff8f89}
+
+  .empty{
+    text-align:center;padding:50px 20px;color:var(--muted);
+    background:#fff;border:1px dashed var(--border);border-radius:16px;
+  }
+  .empty .ico{
+    width:64px;height:64px;border-radius:50%;margin:0 auto 16px;
+    display:grid;place-items:center;background:#f1f4fa;color:#98a3bb;
+  }
+  .empty h3{
+    font-family:"Fraunces",Georgia,serif;font-weight:600;
+    font-size:17px;color:var(--text);margin-bottom:7px;
+  }
+  .empty p{font-size:13px;max-width:360px;margin:0 auto;line-height:1.6}
+
+  .skeleton{
+    background:linear-gradient(90deg,#eef1f8 25%,#e2e8f4 37%,#eef1f8 63%);
+    background-size:400% 100%;
+    animation:sk 1.3s ease infinite;border-radius:12px;height:96px;
+  }
+  @keyframes sk{0%{background-position:100% 50%}100%{background-position:0 50%}}
+
+  @media(max-width:900px){ .stats{grid-template-columns:repeat(2,1fr)} }
+  @media(max-width:640px){
+    .container{padding:18px 14px 40px}
+    .topbar{padding:12px 14px}
+    .topbar .brand .txt{display:none}
+    .user-pill span{display:none}
+    .stat{padding:14px}
+    .stat .num{font-size:24px}
+    .grid2{grid-template-columns:1fr}
+    .status-group{grid-template-columns:1fr;gap:6px}
+    .drawer-head{padding:16px 18px}
+    .drawer-body{padding:18px}
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <img src="images/logo.jpg" alt=""
+           onerror="this.remove();this.parentElement.textContent='AH';">
+    </div>
+    <h1>Panel Admin</h1>
+    <p class="sub">Aspirasi Yayasan Aqilah Hidayah</p>
+
+    <div class="err" id="loginErr" style="display:none"></div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">Email Admin</label>
+        <input type="email" id="email" placeholder="admin@sekolah.sch.id" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <button class="btn-primary" type="submit" id="loginBtn">
+        <span class="lbl">Masuk</span>
+        <span class="spinner"></span>
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-logo">
+        <img src="images/logo.jpg" alt=""
+             onerror="this.remove();this.parentElement.textContent='AH';">
+      </div>
+      <span class="txt">Panel Admin · Aspirasi Aqilah</span>
+    </div>
+    <div class="actions">
+      <div class="user-pill" id="userPill">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        <span id="userEmail">—</span>
+      </div>
+      <button class="btn-logout" id="btnLogout">Keluar</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="stats">
+      <div class="stat s-total">
+        <div class="lbl">Total</div><div class="num" id="statTotal">—</div>
+      </div>
+      <div class="stat s-diterima">
+        <div class="lbl">Diterima</div><div class="num" id="statDiterima">—</div>
+      </div>
+      <div class="stat s-diproses">
+        <div class="lbl">Diproses</div><div class="num" id="statDiproses">—</div>
+      </div>
+      <div class="stat s-selesai">
+        <div class="lbl">Selesai</div><div class="num" id="statSelesai">—</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="searchInput" placeholder="Cari kode DHEKA, isi pesan, jenjang...">
+      </div>
+      <select class="filter" id="filterStatus">
+        <option value="">Semua Status</option>
+        <option value="Diterima">Diterima</option>
+        <option value="Diproses">Diproses</option>
+        <option value="Selesai">Selesai</option>
+      </select>
+      <select class="filter" id="filterKategori">
+        <option value="">Semua Kategori</option>
+        <option value="Saran">Saran</option>
+        <option value="Kritik">Kritik</option>
+        <option value="Ide Kegiatan">Ide Kegiatan</option>
+        <option value="Keluhan">Keluhan</option>
+      </select>
+      <button class="refresh-btn" id="btnRefresh">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+        Muat ulang
+      </button>
+    </div>
+
+    <div class="list" id="list">
+      <div class="skeleton" style="height:120px"></div>
+      <div class="skeleton" style="height:120px"></div>
+      <div class="skeleton" style="height:120px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="backdrop" id="backdrop"></div>
+
+<aside class="drawer" id="drawer" role="dialog" aria-hidden="true">
+  <div class="drawer-head">
+    <div class="meta">
+      <div class="code" id="dCode">DHEKA-XXXXXX</div>
+      <div class="date" id="dDate">—</div>
+    </div>
+    <button class="drawer-close" id="dClose" aria-label="Tutup">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+
+  <div class="drawer-body">
+    <div class="grid2">
+      <div class="info-block" style="margin:0">
+        <div class="lbl">Jenjang & Kelas</div>
+        <div class="val" id="dJenjang">—</div>
+      </div>
+      <div class="info-block" style="margin:0">
+        <div class="lbl">Kategori</div>
+        <div class="val" id="dKategori">—</div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <div class="lbl">Nama (dari pengirim)</div>
+      <div class="val" id="dNama">—</div>
+    </div>
+
+    <div class="info-block">
+      <div class="lbl">Kontak</div>
+      <div class="val" id="dKontak">—</div>
+    </div>
+
+    <div class="info-block">
+      <div class="lbl">Aspirasi / Pesan</div>
+      <div class="val pre" id="dPesan">—</div>
+    </div>
+
+    <div class="info-block">
+      <div class="lbl">Usulan / Solusi</div>
+      <div class="val pre" id="dSolusi">—</div>
+    </div>
+
+    <div class="divider">Balasan Admin</div>
+
+    <div class="field">
+      <label>Status Aspirasi</label>
+      <div class="status-group">
+        <label class="status-opt">
+          <input type="radio" name="dStatus" value="Diterima">
+          <span>Diterima</span>
+        </label>
+        <label class="status-opt">
+          <input type="radio" name="dStatus" value="Diproses">
+          <span>Diproses</span>
+        </label>
+        <label class="status-opt">
+          <input type="radio" name="dStatus" value="Selesai">
+          <span>Selesai</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="dBalasan">Teks Balasan</label>
+      <textarea id="dBalasan" placeholder="Tulis balasan untuk siswa..."></textarea>
+    </div>
+
+    <div class="reply-actions">
+      <button class="btn-cancel" id="dReset" type="button">Reset</button>
+      <button class="btn-primary" id="dSave">
+        <span class="lbl">Simpan Balasan</span>
+        <span class="spinner"></span>
+      </button>
+    </div>
+
+    <div class="meta-foot">
+      <span id="dCreated">Dibuat: —</span>
+      <span id="dUpdated">Diperbarui: —</span>
+    </div>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================================
+   BOOTSTRAP — config dari /api/config
+   ============================================================================ */
+let sb = null;
+
+async function loadSupabaseConfig(){
+  const res = await fetch("/api/config", { cache: "no-store" });
+  if(!res.ok){
+    let msg = "Gagal memuat konfigurasi server";
+    try{ const j = await res.json(); if(j && j.error) msg = j.error; }catch(e){}
+    throw new Error(msg);
+  }
+  const cfg = await res.json();
+  if(!cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY){
+    throw new Error("Konfigurasi Supabase tidak lengkap di server.");
+  }
+  return cfg;
+}
+
+/* ============================================================================
+   UTIL
+   ============================================================================ */
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+
+function esc(s){
+  return String(s ?? "").replace(/[&<>"']/g, c => (
+    { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]
+  ));
+}
+function fmtDate(ts){
+  if(!ts) return "—";
+  try{
+    return new Date(ts).toLocaleString("id-ID", {
+      day:"2-digit", month:"short", year:"numeric",
+      hour:"2-digit", minute:"2-digit"
+    });
+  }catch(e){ return new Date(ts).toLocaleString(); }
+}
+function statusBadge(status){
+  const map = { "Diterima":"diterima", "Diproses":"diproses", "Selesai":"selesai" };
+  const s   = status || "Diterima";
+  return `<span class="badge ${map[s] || "diterima"}">${esc(s)}</span>`;
+}
+
+let toastTimer = null;
+function toast(msg, type = "success"){
+  const t = $("#toast");
+  const iconOk  = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+  const iconErr = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+  t.className = "toast " + type;
+  t.innerHTML = (type === "error" ? iconErr : iconOk) + `<span>${esc(msg)}</span>`;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 2400);
+}
+
+/* ============================================================================
+   STATE
+   ============================================================================ */
+let allData = [];
+let filteredData = [];
+let currentCode = null;
+
+const loginWrap = $("#loginWrap");
+const app       = $("#app");
+const loginForm = $("#loginForm");
+const loginBtn  = $("#loginBtn");
+const loginErr  = $("#loginErr");
+
+/* ============================================================================
+   LOGIN
+   ============================================================================ */
+loginForm.addEventListener("submit", async e => {
+  e.preventDefault();
+  loginErr.style.display = "none";
+
+  if(!sb){ loginErr.style.display = "block"; loginErr.textContent = "Server belum siap."; return; }
+
+  const email    = $("#email").value.trim();
+  const password = $("#password").value;
+
+  if(!email || !password){
+    loginErr.style.display = "block";
+    loginErr.textContent = "Email dan password wajib diisi.";
+    return;
+  }
+
+  loginBtn.classList.add("loading");
+  loginBtn.disabled = true;
+
+  try{
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if(error) throw error;
+    if(!data.session) throw new Error("Sesi tidak terbentuk");
+  }catch(err){
+    loginErr.style.display = "block";
+    loginErr.textContent = err.message === "Invalid login credentials"
+      ? "Email atau password salah."
+      : (err.message || "Gagal login.");
+    loginBtn.classList.remove("loading");
+    loginBtn.disabled = false;
+  }
+});
+
+$("#btnLogout").addEventListener("click", async () => {
+  if(sb) await sb.auth.signOut();
+});
+
+/* ============================================================================
+   LOAD DATA
+   ============================================================================ */
+async function loadAspirations(){
+  $("#list").innerHTML = `
+    <div class="skeleton" style="height:120px"></div>
+    <div class="skeleton" style="height:120px"></div>
+    <div class="skeleton" style="height:120px"></div>`;
+
+  try{
+    const { data, error } = await sb
+      .from("aspirations")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(500);
+
+    if(error) throw error;
+    allData = Array.isArray(data) ? data : [];
+    applyFilters();
+    updateStats();
+  }catch(err){
+    console.error(err);
+    $("#list").innerHTML = `
+      <div class="empty">
+        <div class="ico" style="background:#fdf3f2;color:#c8695f">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </div>
+        <h3>Gagal memuat data</h3>
+        <p>${esc(err.message || "Periksa koneksi dan konfigurasi Supabase.")}</p>
+      </div>`;
+  }
+}
+
+function applyFilters(){
+  const q        = $("#searchInput").value.trim().toLowerCase();
+  const status   = $("#filterStatus").value;
+  const kategori = $("#filterKategori").value;
+
+  filteredData = allData.filter(r => {
+    if(status && r.status !== status) return false;
+    if(kategori && r.kategori !== kategori) return false;
+    if(q){
+      const hay = [r.code, r.pesan, r.solusi, r.jenjang, r.kelas, r.kategori, r.nama]
+        .join(" ").toLowerCase();
+      if(!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
+  renderList();
+}
+
+function renderList(){
+  const wrap = $("#list");
+
+  if(filteredData.length === 0){
+    wrap.innerHTML = `
+      <div class="empty">
+        <div class="ico">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Tidak ada aspirasi</h3>
+        <p>Coba ubah filter atau kata pencarian.</p>
+      </div>`;
+    return;
+  }
+
+  wrap.innerHTML = filteredData.map(r => {
+    const needsReply = !r.balasan || !r.balasan.trim();
+    return `
+      <div class="row ${needsReply ? "unread" : ""}" data-code="${esc(r.code)}" tabindex="0" role="button">
+        <div class="row-head">
+          <div>
+            <div class="row-code">${esc(r.code)}</div>
+            <div class="row-date">${esc(fmtDate(r.created_at))}</div>
+          </div>
+          ${statusBadge(r.status)}
+        </div>
+        <div class="row-preview">${esc(r.pesan)}</div>
+        <div class="row-meta">
+          <span class="chip cat">${esc(r.kategori)}</span>
+          <span class="chip">${esc(r.jenjang)}${r.kelas ? " · " + esc(r.kelas) : ""}</span>
+          ${needsReply ? '<span class="chip" style="background:#fff5e6;color:#b0761a">Butuh balasan</span>' : ""}
+        </div>
+      </div>`;
+  }).join("");
+
+  $$(".row", wrap).forEach(row => {
+    const open = () => openDrawer(row.dataset.code);
+    row.addEventListener("click", open);
+    row.addEventListener("keydown", e => {
+      if(e.key === "Enter" || e.key === " "){ e.preventDefault(); open(); }
+    });
+  });
+}
+
+function updateStats(){
+  const total    = allData.length;
+  const diterima = allData.filter(r => r.status === "Diterima").length;
+  const diproses = allData.filter(r => r.status === "Diproses").length;
+  const selesai  = allData.filter(r => r.status === "Selesai").length;
+  $("#statTotal").textContent    = total;
+  $("#statDiterima").textContent = diterima;
+  $("#statDiproses").textContent = diproses;
+  $("#statSelesai").textContent  = selesai;
+}
+
+/* ============================================================================
+   DRAWER
+   ============================================================================ */
+const drawer   = $("#drawer");
+const backdrop = $("#backdrop");
+
+function openDrawer(code){
+  const rec = allData.find(r => r.code === code);
+  if(!rec){ toast("Data tidak ditemukan", "error"); return; }
+  currentCode = code;
+
+  $("#dCode").textContent     = rec.code;
+  $("#dDate").textContent     = fmtDate(rec.created_at);
+  $("#dJenjang").textContent  = rec.jenjang + (rec.kelas ? " · " + rec.kelas : "");
+  $("#dKategori").textContent = rec.kategori;
+
+  const nama   = (rec.nama || "").trim();
+  const kontak = (rec.kontak || "").trim();
+
+  const namaEl   = $("#dNama");
+  const kontakEl = $("#dKontak");
+  namaEl.textContent   = nama   || "— tidak diisi —";
+  kontakEl.textContent = kontak || "— tidak diisi —";
+  namaEl.classList.toggle("empt", !nama);
+  kontakEl.classList.toggle("empt", !kontak);
+
+  $("#dPesan").textContent  = rec.pesan;
+  $("#dSolusi").textContent = rec.solusi;
+
+  $$('input[name="dStatus"]').forEach(inp => {
+    inp.checked = inp.value === (rec.status || "Diterima");
+  });
+  $("#dBalasan").value = rec.balasan || "";
+
+  $("#dCreated").textContent = "Dibuat: " + fmtDate(rec.created_at);
+  $("#dUpdated").textContent = "Diperbarui: " + fmtDate(rec.updated_at || rec.created_at);
+
+  backdrop.classList.add("show");
+  drawer.classList.add("show");
+  drawer.setAttribute("aria-hidden", "false");
+
+  setTimeout(() => $("#dBalasan").focus(), 320);
+}
+
+function closeDrawer(){
+  drawer.classList.remove("show");
+  backdrop.classList.remove("show");
+  drawer.setAttribute("aria-hidden", "true");
+  currentCode = null;
+}
+
+$("#dClose").addEventListener("click", closeDrawer);
+backdrop.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && drawer.classList.contains("show")) closeDrawer();
+});
+
+$("#dReset").addEventListener("click", () => {
+  if(!currentCode) return;
+  const rec = allData.find(r => r.code === currentCode);
+  if(!rec) return;
+  $$('input[name="dStatus"]').forEach(inp => {
+    inp.checked = inp.value === (rec.status || "Diterima");
+  });
+  $("#dBalasan").value = rec.balasan || "";
+  toast("Form direset ke nilai tersimpan");
+});
+
+/* ============================================================================
+   SIMPAN BALASAN
+   ============================================================================ */
+$("#dSave").addEventListener("click", async () => {
+  if(!currentCode){ toast("Tidak ada data terpilih", "error"); return; }
+  if(!sb){ toast("Server belum siap", "error"); return; }
+
+  const btn     = $("#dSave");
+  const status  = ($('input[name="dStatus"]:checked') || {}).value;
+  const balasan = $("#dBalasan").value.trim();
+
+  if(!status){ toast("Pilih status terlebih dahulu", "error"); return; }
+
+  btn.classList.add("loading");
+  btn.disabled = true;
+
+  const rec = allData.find(r => r.code === currentCode);
+  const payload = {
+    status,
+    balasan,
+    balasan_at: balasan ? new Date().toISOString() : null
+  };
+
+  try{
+    const { error } = await sb
+      .from("aspirations")
+      .update(payload)
+      .eq("code", currentCode);
+
+    if(error) throw error;
+
+    if(rec){
+      Object.assign(rec, payload);
+      rec.updated_at = new Date().toISOString();
+    }
+
+    updateStats();
+    applyFilters();
+
+    toast("Balasan berhasil disimpan");
+    $("#dUpdated").textContent = "Diperbarui: " + fmtDate(new Date().toISOString());
+  }catch(err){
+    console.error(err);
+    toast(err.message || "Gagal menyimpan balasan", "error");
+  }finally{
+    btn.classList.remove("loading");
+    btn.disabled = false;
+  }
+});
+
+/* ============================================================================
+   FILTER
+   ============================================================================ */
+let searchTimer = null;
+$("#searchInput").addEventListener("input", () => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(applyFilters, 180);
+});
+$("#filterStatus").addEventListener("change", applyFilters);
+$("#filterKategori").addEventListener("change", applyFilters);
+$("#btnRefresh").addEventListener("click", () => loadAspirations());
+
+/* ============================================================================
+   BOOTSTRAP INIT
+   ============================================================================ */
+(async () => {
+  try{
+    const cfg = await loadSupabaseConfig();
+    sb = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY);
+
+    // Auth listener
+    sb.auth.onAuthStateChange((event, session) => {
+      if(session && session.user){
+        loginWrap.style.display = "none";
+        app.classList.add("show");
+        $("#userEmail").textContent = session.user.email || "admin";
+        loginBtn.classList.remove("loading");
+        loginBtn.disabled = false;
+        loadAspirations();
+      }else{
+        loginWrap.style.display = "grid";
+        app.classList.remove("show");
+        loginBtn.classList.remove("loading");
+        loginBtn.disabled = false;
+        closeDrawer();
+      }
+    });
+
+    // Realtime (opsional)
+    sb.channel("admin-aspirations")
+      .on("postgres_changes",
+          { event: "*", schema: "public", table: "aspirations" },
+          payload => {
+            if(payload.eventType === "INSERT"){
+              if(!allData.some(r => r.code === payload.new.code)){
+                allData.unshift(payload.new);
+              }
+            }else if(payload.eventType === "UPDATE"){
+              const i = allData.findIndex(r => r.code === payload.new.code);
+              if(i >= 0) allData[i] = payload.new;
+            }else if(payload.eventType === "DELETE"){
+              allData = allData.filter(r => r.code !== payload.old.code);
+            }
+            updateStats();
+            applyFilters();
+          })
+      .subscribe();
+
+    // Cek sesi
+    const { data } = await sb.auth.getSession();
+    if(!data.session) loginWrap.style.display = "grid";
+
+  }catch(err){
+    console.error(err);
+    loginErr.style.display = "block";
+    loginErr.textContent = err.message || "Tidak bisa terhubung ke server.";
+    loginBtn.disabled = true;
+  }
+})();
+</script>
+
+</body>
+  </html>
