@@ -12,6 +12,8 @@ export const config = { runtime: "nodejs" };
 
 const MIN_SECONDS = 3;      // manusia butuh waktu isi form; bot biasanya < 1 detik
 const MAX_LEN = { pesan: 3000, solusi: 3000, nama: 120, kontak: 120 };
+const RATE_LIMIT_WINDOW_MIN = 10; // jendela waktu rate limit
+const RATE_LIMIT_MAX = 5;         // maksimal N aspirasi per visitor_id per jendela waktu
 
 function bad(res, status, msg) {
   return res.status(status).json({ error: msg });
@@ -29,8 +31,9 @@ export default async function handler(req, res) {
   const {
     kategori, jenjang, kelas, pesan, solusi,
     nama = "", kontak = "",
-    hp = "",           // honeypot: HARUS kosong
-    ts = 0              // timestamp (ms) saat form dimuat di client
+    hp = "",              // honeypot: HARUS kosong
+    ts = 0,               // timestamp (ms) saat form dimuat di client
+    visitorId = null      // ID anonim per-browser, dipakai untuk rate limit
   } = body;
 
   // ---- 1. HONEYPOT ----
@@ -74,14 +77,36 @@ export default async function handler(req, res) {
     return bad(res, 500, "Konfigurasi server belum lengkap.");
   }
 
+  const authHeaders = {
+    "Content-Type": "application/json",
+    "apikey": serviceKey,
+    "Authorization": `Bearer ${serviceKey}`
+  };
+
+  // ---- 5. RATE LIMIT (per visitor_id, bukan per-IP — VPN/jaringan
+  // beda tetap bisa dibatasi selama browser/ID lokalnya sama) ----
+  if (visitorId && typeof visitorId === "string") {
+    try {
+      const since = new Date(Date.now() - RATE_LIMIT_WINDOW_MIN * 60000).toISOString();
+      const countRes = await fetch(
+        `${url}/rest/v1/aspirasi?visitor_id=eq.${encodeURIComponent(visitorId)}&created_at=gte.${encodeURIComponent(since)}&select=id`,
+        { headers: { ...authHeaders, "Prefer": "count=exact", "Range": "0-0" } }
+      );
+      const range = countRes.headers.get("content-range"); // format: "0-0/N"
+      const total = range ? parseInt(range.split("/")[1], 10) : 0;
+      if (total >= RATE_LIMIT_MAX) {
+        return bad(res, 429, "Kamu sudah mengirim beberapa aspirasi baru-baru ini. Coba lagi beberapa menit lagi.");
+      }
+    } catch (e) {
+      console.error("Rate limit check gagal (dilewati):", e);
+      // gagal cek rate limit bukan alasan untuk block total; lanjutkan saja
+    }
+  }
+
   try {
     const r = await fetch(`${url}/rest/v1/rpc/kirim_aspirasi`, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "apikey": serviceKey,
-        "Authorization": `Bearer ${serviceKey}`
-      },
+      headers: authHeaders,
       body: JSON.stringify({
         p_kategori: kategori.trim(),
         p_jenjang: jenjang.trim(),
@@ -89,7 +114,8 @@ export default async function handler(req, res) {
         p_pesan: pesan.trim(),
         p_solusi: solusi.trim(),
         p_nama: (nama || "").trim(),
-        p_kontak: (kontak || "").trim()
+        p_kontak: (kontak || "").trim(),
+        p_visitor_id: visitorId || null
       })
     });
 
