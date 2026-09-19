@@ -170,7 +170,7 @@
 
   .dash-main{max-width:1300px;margin:0 auto;width:100%;padding:20px 16px 60px;flex:1}
 
-  .dash-tabbar{display:flex;gap:6px;background:#fff;border:1px solid var(--border);padding:5px;border-radius:15px;margin-bottom:20px;max-width:420px}
+  .dash-tabbar{display:flex;gap:6px;background:#fff;border:1px solid var(--border);padding:5px;border-radius:15px;margin-bottom:20px;max-width:520px}
   .dash-tabbar .tab{
     flex:1;border:0;background:transparent;padding:10px 8px;border-radius:11px;
     font-size:12.5px;font-weight:800;color:var(--muted);cursor:pointer;transition:.2s var(--ease);
@@ -473,6 +473,7 @@
     <main class="dash-main">
       <div class="dash-tabbar" role="tablist">
         <button class="tab active" data-tab="aspirasi" type="button">Aspirasi</button>
+        <button class="tab" data-tab="arsip" type="button">Arsip</button>
         <button class="tab hide" data-tab="akun" id="tabAkunBtn" type="button">Kelola Akun</button>
       </div>
 
@@ -571,6 +572,19 @@
         <div class="pagination hide" id="aspirasiPagination"></div>
       </section>
 
+      <!-- ===== PANEL ARSIP (aspirasi yang sudah final) ===== -->
+      <section class="dash-panel" id="panelArsip">
+        <div class="section-head">
+          <div>
+            <h2>Arsip Aspirasi</h2>
+            <p>Aspirasi yang sudah ditangani (Dicatat / Dibalas / Ditindaklanjuti / Ditolak). Hanya owner yang bisa mengubah hasilnya.</p>
+          </div>
+          <span class="count-badge" id="arsipCountBadge">0 arsip</span>
+        </div>
+        <div id="arsipList"></div>
+        <div class="pagination hide" id="arsipPagination"></div>
+      </section>
+
       <!-- ===== PANEL KELOLA AKUN (owner only) ===== -->
       <section class="dash-panel" id="panelAkun">
         <div class="section-head">
@@ -617,6 +631,34 @@
         <button class="btn ghost small" type="button" id="actionCancel">Batal</button>
         <button class="btn small" type="button" id="actionOk">
           <span class="btn-label">Simpan</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== EDIT ARSIP MODAL (owner only) ===== -->
+  <div class="modal-overlay hide" id="editOverlay">
+    <div class="modal-box">
+      <h3>Ubah Hasil Aspirasi</h3>
+      <p id="editCodeLabel">DHEKA-XXXXXX</p>
+      <div class="field">
+        <label for="editStatus">Status</label>
+        <select id="editStatus">
+          <option value="Dicatat">Dicatat</option>
+          <option value="Dibalas">Dibalas</option>
+          <option value="Ditindaklanjuti">Ditindaklanjuti</option>
+          <option value="Ditolak">Ditolak</option>
+        </select>
+      </div>
+      <div class="field" id="editTextWrap">
+        <label id="editTextLabel" for="editTextarea">Balasan Admin</label>
+        <textarea id="editTextarea" rows="4"></textarea>
+        <div class="msg error hide" id="editFieldError" style="margin-top:8px;margin-bottom:0">Wajib diisi.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn ghost small" type="button" id="editCancel">Batal</button>
+        <button class="btn small" type="button" id="editOk">
+          <span class="btn-label">Simpan Perubahan</span>
         </button>
       </div>
     </div>
@@ -851,6 +893,7 @@ async function afterAuthResolved(){
 function switchDashTab(name){
   $$(".dash-tabbar .tab").forEach(t => t.classList.toggle("active", t.dataset.tab === name));
   $("#panelAspirasi").classList.toggle("active", name === "aspirasi");
+  $("#panelArsip").classList.toggle("active", name === "arsip");
   $("#panelAkun").classList.toggle("active", name === "akun");
 }
 $$(".dash-tabbar .tab").forEach(t => t.addEventListener("click", () => {
@@ -864,7 +907,10 @@ $$(".dash-tabbar .tab").forEach(t => t.addEventListener("click", () => {
 let allAspirasi = [];
 let expandedCodes = new Set();
 let currentPage = 1;
+let currentArsipPage = 1;
 const PAGE_SIZE = 8;
+function isActiveStatus(status){ return status === "Diterima" || status === "Sedang Ditinjau"; }
+function isArchivedStatus(status){ return !isActiveStatus(status); }
 
 function skeletonBlocks(n, height){
   return Array.from({ length: n }).map(() =>
@@ -927,7 +973,9 @@ async function loadAspirasi(){
   allAspirasi = data || [];
   renderStats(allAspirasi);
   currentPage = 1;
+  currentArsipPage = 1;
   renderAspirasiList();
+  renderArsipList();
 }
 
 /* =========================================================
@@ -982,7 +1030,13 @@ function renderTicketActionArea(r, canManage, isOwner){
   }
 
   // status final (Dicatat / Dibalas / Ditindaklanjuti / Ditolak)
-  return isOwner ? `<button class="btn danger small" type="button" data-delete="${esc(r.code)}">Hapus</button>` : "";
+  // -> hanya OWNER yang boleh mengubah hasil (Edit) atau menghapus.
+  if(!isOwner) return "";
+  return `
+    <div class="action-row">
+      <button class="btn ghost small" type="button" data-edit="${esc(r.code)}">Edit</button>
+      <button class="btn danger small" type="button" data-delete="${esc(r.code)}">Hapus</button>
+    </div>`;
 }
 
 function renderOutcomeBlock(r){
@@ -1058,21 +1112,21 @@ function renderTicketTemplate(r, canManage, isOwner){
 function renderAspirasiList(){
   const wrap = $("#aspirasiList");
   const pagEl = $("#aspirasiPagination");
-  const filtered = applyFilters();
+  const filtered = applyFilters().filter(r => isActiveStatus(r.status));
 
   // DOM lama akan diganti -> lepas semua presence channel yang nempel di situ
   Array.from(activeViewerChannels.keys()).forEach(leaveTicketPresence);
 
   $("#aspirasiCountBadge").textContent = filtered.length + " aspirasi";
 
-  if(allAspirasi.length === 0){
+  if(allAspirasi.filter(r => isActiveStatus(r.status)).length === 0){
     wrap.innerHTML = `
       <div class="empty">
         <div class="icon" style="margin:0 auto 14px">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         </div>
         <h3>Belum ada aspirasi</h3>
-        <p>Belum ada aspirasi yang masuk ke sistem. Aspirasi dari situs publik akan muncul di sini secara otomatis.</p>
+        <p>Aspirasi baru dari situs publik akan muncul di sini. Yang sudah ditangani otomatis pindah ke tab Arsip.</p>
       </div>`;
     pagEl.classList.add("hide");
     return;
@@ -1112,6 +1166,83 @@ function renderAspirasiList(){
       const ticketEl = wrap.querySelector(`.ticket[data-code="${CSS.escape(r.code)}"]`);
       if(ticketEl) joinTicketPresence(r.code, ticketEl);
     }
+  });
+}
+
+function renderArsipList(){
+  const wrap = $("#arsipList");
+  const pagEl = $("#arsipPagination");
+  const filtered = applyFilters().filter(r => isArchivedStatus(r.status));
+
+  $("#arsipCountBadge").textContent = filtered.length + " arsip";
+
+  const totalArchived = allAspirasi.filter(r => isArchivedStatus(r.status)).length;
+  if(totalArchived === 0){
+    wrap.innerHTML = `
+      <div class="empty">
+        <div class="icon" style="margin:0 auto 14px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v3"/><path d="M3 8h18v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 12h6"/></svg>
+        </div>
+        <h3>Arsip masih kosong</h3>
+        <p>Aspirasi yang sudah Dicatat, Dibalas, Ditindaklanjuti, atau Ditolak akan otomatis pindah ke sini.</p>
+      </div>`;
+    pagEl.classList.add("hide");
+    return;
+  }
+
+  if(filtered.length === 0){
+    wrap.innerHTML = `
+      <div class="empty">
+        <div class="icon" style="margin:0 auto 14px">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <h3>Tidak ada hasil</h3>
+        <p>Tidak ada arsip yang cocok dengan pencarian/filter kamu.</p>
+      </div>`;
+    pagEl.classList.add("hide");
+    return;
+  }
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  if(currentArsipPage > totalPages) currentArsipPage = totalPages;
+  const start = (currentArsipPage - 1) * PAGE_SIZE;
+  const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+  const canManage = myProfile.role === "owner" || myProfile.role === "admin";
+  const isOwner = myProfile.role === "owner";
+
+  wrap.innerHTML = pageItems.map(r => renderTicketTemplate(r, canManage, isOwner)).join("");
+
+  attachTicketEvents(wrap);
+  renderArsipPagination(pagEl, totalPages);
+}
+
+function renderArsipPagination(pagEl, totalPages){
+  if(totalPages <= 1){ pagEl.classList.add("hide"); pagEl.innerHTML = ""; return; }
+  pagEl.classList.remove("hide");
+
+  let html = `<button data-page="prev" ${currentArsipPage === 1 ? "disabled" : ""}>‹ Sebelumnya</button>`;
+  for(let p = 1; p <= totalPages; p++){
+    if(totalPages > 7 && p !== 1 && p !== totalPages && Math.abs(p - currentArsipPage) > 1){
+      if(p === 2 || p === totalPages - 1) html += `<span style="color:var(--muted);padding:0 4px">…</span>`;
+      continue;
+    }
+    html += `<button data-page="${p}" class="${p === currentArsipPage ? "active" : ""}">${p}</button>`;
+  }
+  html += `<button data-page="next" ${currentArsipPage === totalPages ? "disabled" : ""}>Berikutnya ›</button>`;
+  pagEl.innerHTML = html;
+
+  $$("button[data-page]", pagEl).forEach(btn => {
+    btn.addEventListener("click", () => {
+      const v = btn.dataset.page;
+      const filtered = applyFilters().filter(r => isArchivedStatus(r.status));
+      const totalPages2 = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+      if(v === "prev") currentArsipPage = Math.max(1, currentArsipPage - 1);
+      else if(v === "next") currentArsipPage = Math.min(totalPages2, currentArsipPage + 1);
+      else currentArsipPage = Number(v);
+      renderArsipList();
+      $("#arsipList").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
   });
 }
 
@@ -1221,6 +1352,7 @@ function friendlyActionError(err){
   if(msg.includes("alasan_required")) return "Alasan penolakan wajib diisi.";
   if(msg.includes("not_allowed")) return "Kamu tidak memiliki izin untuk melakukan ini.";
   if(msg.includes("not_found")) return "Aspirasi tidak ditemukan.";
+  if(msg.includes("invalid_status")) return "Status tidak valid.";
   return "Gagal menyimpan perubahan. Silakan coba lagi.";
 }
 
@@ -1318,6 +1450,93 @@ async function doTolak(code){
 }
 
 /* =========================================================
+   7g. EDIT ARSIP (owner only)
+   ========================================================= */
+function editArsipTextLabel(status){
+  if(status === "Dibalas") return "Balasan Admin";
+  if(status === "Ditolak") return "Alasan Ditolak";
+  if(status === "Ditindaklanjuti") return "Catatan Internal (opsional)";
+  return "";
+}
+function editArsipCurrentText(r, status){
+  if(status === "Dibalas") return r.balasan || "";
+  if(status === "Ditolak") return r.reject_reason || "";
+  if(status === "Ditindaklanjuti") return r.internal_note || "";
+  return "";
+}
+
+function openEditArsipModal(r){
+  return new Promise(resolve => {
+    const overlay = $("#editOverlay");
+    const statusSel = $("#editStatus");
+    const textWrap = $("#editTextWrap");
+    const textLabel = $("#editTextLabel");
+    const ta = $("#editTextarea");
+    const err = $("#editFieldError");
+
+    $("#editCodeLabel").textContent = r.code;
+    statusSel.value = r.status;
+    ta.value = editArsipCurrentText(r, r.status);
+    textLabel.textContent = editArsipTextLabel(r.status);
+    textWrap.classList.toggle("hide", r.status === "Dicatat");
+    err.classList.add("hide");
+    overlay.classList.remove("hide");
+
+    const syncFields = () => {
+      const s = statusSel.value;
+      textLabel.textContent = editArsipTextLabel(s);
+      textWrap.classList.toggle("hide", s === "Dicatat");
+      if(!ta.value) ta.value = editArsipCurrentText(r, s);
+      err.classList.add("hide");
+    };
+    statusSel.addEventListener("change", syncFields);
+
+    const okBtn = $("#editOk");
+    const cancelBtn = $("#editCancel");
+
+    const cleanup = (result) => {
+      overlay.classList.add("hide");
+      statusSel.removeEventListener("change", syncFields);
+      okBtn.removeEventListener("click", onOk);
+      cancelBtn.removeEventListener("click", onCancel);
+      resolve(result);
+    };
+    const onOk = () => {
+      const s = statusSel.value;
+      const text = ta.value.trim();
+      if((s === "Dibalas" || s === "Ditolak") && !text){
+        err.classList.remove("hide");
+        return;
+      }
+      cleanup({ status: s, text });
+    };
+    const onCancel = () => cleanup(null);
+
+    okBtn.addEventListener("click", onOk);
+    cancelBtn.addEventListener("click", onCancel);
+  });
+}
+
+async function doEditArsip(code){
+  const r = allAspirasi.find(a => a.code === code);
+  if(!r) return;
+
+  const result = await openEditArsipModal(r);
+  if(!result) return;
+
+  const { error } = await supa.rpc("owner_edit_arsip", {
+    p_code: code, p_status: result.status, p_text: result.text || null
+  });
+
+  if(error){
+    showToast("error", friendlyActionError(error));
+    return;
+  }
+  showToast("success", "Hasil aspirasi berhasil diubah.");
+  await loadAspirasi();
+}
+
+/* =========================================================
    7f. TIMELINE / LINTASAN STATUS (lazy-load per tiket)
    ========================================================= */
 async function loadTimeline(code, container){
@@ -1409,6 +1628,11 @@ function attachTicketEvents(wrap){
   });
 
   // hapus
+  // edit hasil arsip (owner only)
+  $$("[data-edit]", wrap).forEach(btn => {
+    btn.addEventListener("click", () => doEditArsip(btn.dataset.edit));
+  });
+
   $$("[data-delete]", wrap).forEach(btn => {
     btn.addEventListener("click", async () => {
       const code = btn.dataset.delete;
@@ -1460,12 +1684,12 @@ function initAspirasiRealtime(){
 
 // filter & search listeners
 ["fltStatus","fltKategori","fltJenjang"].forEach(id => {
-  $("#" + id).addEventListener("change", () => { currentPage = 1; renderAspirasiList(); });
+  $("#" + id).addEventListener("change", () => { currentPage = 1; currentArsipPage = 1; renderAspirasiList(); renderArsipList(); });
 });
 let searchDebounce = null;
 $("#fltSearch").addEventListener("input", () => {
   clearTimeout(searchDebounce);
-  searchDebounce = setTimeout(() => { currentPage = 1; renderAspirasiList(); }, 220);
+  searchDebounce = setTimeout(() => { currentPage = 1; currentArsipPage = 1; renderAspirasiList(); renderArsipList(); }, 220);
 });
 $("#btnResetFilter").addEventListener("click", () => {
   $("#fltSearch").value = "";
@@ -1473,7 +1697,9 @@ $("#btnResetFilter").addEventListener("click", () => {
   $("#fltKategori").value = "";
   $("#fltJenjang").value = "";
   currentPage = 1;
+  currentArsipPage = 1;
   renderAspirasiList();
+  renderArsipList();
 });
 
 /* =========================================================
